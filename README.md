@@ -3,10 +3,10 @@
 
 <!-- BADGES -->
 <p align="center">
-  <img src="https://img.shields.io/github/release/mohammadne/Ventoy.svg?style=for-the-badge">
-  <img src="https://img.shields.io/github/license/mohammadne/Ventoy?style=for-the-badge">
-  <img src="https://img.shields.io/github/stars/mohammadne/Ventoy?style=for-the-badge">
-  <img src="https://img.shields.io/github/downloads/mohammadne/Ventoy/total.svg?style=for-the-badge">
+  <img src="https://img.shields.io/github/release/mohammadne/bookman.svg?style=for-the-badge">
+  <img src="https://img.shields.io/github/license/mohammadne/bookman?style=for-the-badge">
+  <img src="https://img.shields.io/github/stars/mohammadne/bookman?style=for-the-badge">
+  <img src="https://img.shields.io/github/downloads/mohammadne/bookman/total.svg?style=for-the-badge">
 </p>
 
 <!-- Overview -->
