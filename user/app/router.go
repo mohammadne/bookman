@@ -11,5 +11,5 @@ func routeUrls(e *echo.Echo) {
 	e.GET("/ping", ctrl.Ping)
 
 	e.GET("/users/:user_id", ctrl.GetUser)
-	e.GET("/users", ctrl.CreateUser)
+	e.POST("/users", ctrl.CreateUser)
 }
