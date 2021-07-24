@@ -8,3 +8,7 @@ interact with user api, it will handle the requests.
 it will validate the request and if validations passed,
 then it will pass the routine to the service
 
+2. Service
+
+we have no knowledge about web frameworks here
+
