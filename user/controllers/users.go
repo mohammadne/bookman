@@ -6,28 +6,22 @@ import (
 	"github.com/labstack/echo"
 	"github.com/mohammadne/bookman/user/domain"
 	"github.com/mohammadne/bookman/user/services"
+	"github.com/mohammadne/bookman/user/utils"
 )
 
-// curl -X POST localhost:8080/users -d '{"id": 123}'
+// curl -X POST localhost:8080/users \
+// -H 'Content-Type: application/json'\
+// -d '{"id": 123}'
 func (c *Controller) CreateUser(ctx echo.Context) error {
 	user := new(domain.User)
 	if err := ctx.Bind(user); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		restErr := utils.NewBadRequest("invalid json body")
+		return ctx.JSON(restErr.Status, restErr)
 	}
-
-	// bytes, err := ioutil.ReadAll(ctx.Request().Body)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// var user users.User
-	// if err := json.Unmarshal(bytes, &user); err != nil {
-	// 	return err
-	// }
 
 	result, saveErr := services.CreateUser(*user)
 	if saveErr != nil {
-		return saveErr
+		return ctx.JSON(saveErr.Status, saveErr)
 	}
 
 	return ctx.JSON(http.StatusCreated, result)

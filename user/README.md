@@ -1,5 +1,8 @@
 # BOOKMAN User API
 
+## how to run
+`go run app/*.go`
+
 we will use MVC pattern:
 
 1. Controller 
