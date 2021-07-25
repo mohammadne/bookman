@@ -1,7 +1,7 @@
 package services
 
-import "github.com/mohammadne/bookman/user/domain/users"
+import "github.com/mohammadne/bookman/user/domain"
 
-func CreateUser(user users.User) (*users.User, error) {
+func CreateUser(user domain.User) (*domain.User, error) {
 	return &user, nil
 }

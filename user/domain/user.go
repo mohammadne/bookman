@@ -1,4 +1,4 @@
-package users
+package domain
 
 // User entity is the core application model
 type User struct {

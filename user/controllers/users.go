@@ -4,13 +4,13 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
-	"github.com/mohammadne/bookman/user/domain/users"
+	"github.com/mohammadne/bookman/user/domain"
 	"github.com/mohammadne/bookman/user/services"
 )
 
 // curl -X POST localhost:8080/users -d '{"id": 123}'
 func (c *Controller) CreateUser(ctx echo.Context) error {
-	user := new(users.User)
+	user := new(domain.User)
 	if err := ctx.Bind(user); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
