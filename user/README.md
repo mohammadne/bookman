@@ -15,3 +15,8 @@ then it will pass the routine to the service
 
 we have no knowledge about web frameworks here
 
+## DTO
+an object that we will transfer from persistance to application layer and backward
+
+## DAO
+persistance and retrieve logic of DTO and it's an access level to database

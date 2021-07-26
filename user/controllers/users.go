@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
-	"github.com/mohammadne/bookman/user/domain"
+	"github.com/mohammadne/bookman/user/domain/users"
 	"github.com/mohammadne/bookman/user/services"
 	"github.com/mohammadne/bookman/user/utils"
 )
@@ -13,9 +13,9 @@ import (
 // -H 'Content-Type: application/json'\
 // -d '{"id": 123}'
 func (c *Controller) CreateUser(ctx echo.Context) error {
-	user := new(domain.User)
+	user := new(users.User)
 	if err := ctx.Bind(user); err != nil {
-		restErr := utils.NewBadRequest("invalid json body")
+		restErr := utils.NewBadRequestError("invalid json body")
 		return ctx.JSON(restErr.Status, restErr)
 	}
 
