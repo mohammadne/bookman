@@ -5,11 +5,15 @@ import (
 	"github.com/mohammadne/bookman/user/utils"
 )
 
-func CreateUser(user users.User) (*users.User, *utils.RestError) {
+func CreateUser(user *users.User, dao users.UserDAO) (*users.User, *utils.RestError) {
 	if err := user.Validate(); err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	if err := dao.Save(user); err != nil {
+		return nil, err
+	}
+
+	return user, nil
 
 }

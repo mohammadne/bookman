@@ -19,7 +19,8 @@ func (c *Controller) CreateUser(ctx echo.Context) error {
 		return ctx.JSON(restErr.Status, restErr)
 	}
 
-	result, saveErr := services.CreateUser(*user)
+	dao := users.MySQLUserDao{}
+	result, saveErr := services.CreateUser(user, dao)
 	if saveErr != nil {
 		return ctx.JSON(saveErr.Status, saveErr)
 	}
