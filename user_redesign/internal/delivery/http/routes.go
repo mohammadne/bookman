@@ -8,6 +8,6 @@ import (
 // Map comments routes
 // h comments.Handlers, mw *middleware.MiddlewareManager
 func MapUserRoutes(group *echo.Group, h internal.IUserHandler) {
-	group.POST("/users", h.Create())
-	group.GET("/users/:user_id", h.Get())
+	group.POST("/users", h.Create)
+	group.GET("/users/:user_id", h.Get)
 }

@@ -18,8 +18,6 @@ import (
 )
 
 const (
-	certFile       = "ssl/Server.crt"
-	keyFile        = "ssl/Server.pem"
 	maxHeaderBytes = 1 << 20
 	ctxTimeout     = 5
 )
@@ -85,7 +83,7 @@ func (s *Server) MapHandlers(e *echo.Echo) error {
 	// Init handlers
 	userH := delivery.NewUserHandler(userU)
 
-	// WEB framework path prefix
+	// create grouped pathes
 	v1 := e.Group("/api/v1")
 	userGroup := v1.Group("/users")
 

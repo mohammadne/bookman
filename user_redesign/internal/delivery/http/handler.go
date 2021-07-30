@@ -1,8 +1,12 @@
 package http
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"github.com/mohammadne/bookman/user/internal"
+	"github.com/mohammadne/bookman/user/internal/entities"
+	"github.com/mohammadne/bookman/user/pkg/errors"
 )
 
 type userHandler struct {
@@ -17,10 +21,21 @@ func NewUserHandler(usecase internal.IUserUsecase) *userHandler {
 	}
 }
 
-func (h *userHandler) Create() echo.HandlerFunc {
-	return nil
+func (h *userHandler) Create(ctx echo.Context) error {
+	user := new(entities.User)
+	if err := ctx.Bind(user); err != nil {
+		restErr := errors.NewBadRequestError("invalid json body")
+		return ctx.JSON(restErr.Status, restErr)
+	}
+
+	result, err := h.usecase.Create(nil, user)
+	if err != nil {
+		return ctx.JSON(err.Status, err)
+	}
+
+	return ctx.JSON(http.StatusCreated, result)
 }
 
-func (h *userHandler) Get() echo.HandlerFunc {
+func (h *userHandler) Get(ctx echo.Context) error {
 	return nil
 }
