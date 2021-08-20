@@ -10,5 +10,7 @@
 </p>
 
 <!-- Overview -->
-<img align="center" src="https://user-images.githubusercontent.com/51189292/126811751-543ddd31-1184-45e0-927a-d8ada35326e6.png">
+<p align="center">
+  <img src="assets/bookman.png" />
+</p>
 
