@@ -5,7 +5,7 @@ import (
 	"github.com/mohammadne/bookman/core/logger"
 )
 
-type WebHandler interface {
+type Web interface {
 	Initialize()
 	Start()
 }
@@ -19,7 +19,7 @@ type echoWebHandler struct {
 	instance *echo.Echo
 }
 
-func NewEcho(cfg *Config, log *logger.Logger) WebHandler {
+func NewEcho(cfg *Config, log *logger.Logger) Web {
 	return &echoWebHandler{config: cfg, logger: log}
 }
 

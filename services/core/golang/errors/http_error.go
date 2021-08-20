@@ -6,15 +6,15 @@ import (
 	"net/http"
 )
 
-type RestError struct {
+type HttpError struct {
 	Message string        `json:"message"`
 	Status  int           `json:"status"`
 	Error   string        `json:"error"`
 	Causes  []interface{} `json:"causes"`
 }
 
-func NewRestError(message string, status int, err string, causes []interface{}) *RestError {
-	return &RestError{
+func NewHttpError(message string, status int, err string, causes []interface{}) *HttpError {
+	return &HttpError{
 		Message: message,
 		Status:  status,
 		Error:   err,
@@ -22,45 +22,53 @@ func NewRestError(message string, status int, err string, causes []interface{}) 
 	}
 }
 
-func NewRestErrorFromBytes(bytes []byte) (*RestError, error) {
-	var apiErr *RestError
+func NewFromBytesHttpError(bytes []byte) (*HttpError, error) {
+	var apiErr *HttpError
 	if err := json.Unmarshal(bytes, &apiErr); err != nil {
 		return nil, errors.New("invalid json")
 	}
 	return apiErr, nil
 }
 
-func NewBadRequestError(message string) *RestError {
-	return &RestError{
+func NewBadRequestHttpError(message string) *HttpError {
+	return &HttpError{
 		Message: message,
 		Status:  http.StatusBadRequest,
 		Error:   "bad_request",
 	}
 }
 
-func NewNotFoundError(message string) *RestError {
-	return &RestError{
+func NewNotFoundHttpError(message string) *HttpError {
+	return &HttpError{
 		Message: message,
 		Status:  http.StatusNotFound,
 		Error:   "not_found",
 	}
 }
 
-func NewUnauthorizedError(message string) *RestError {
-	return &RestError{
+func NewUnauthorizedHttpError(message string) *HttpError {
+	return &HttpError{
 		Message: message,
 		Status:  http.StatusUnauthorized,
 		Error:   "unauthorized",
 	}
 }
 
-func NewInternalServerError(message string, errors ...error) *RestError {
+func NewNotImplementedHttpError() *HttpError {
+	return &HttpError{
+		Message: "not implemented",
+		Status:  http.StatusNotImplemented,
+		Error:   "not_implemented",
+	}
+}
+
+func NewInternalServerHttpError(message string, errors ...error) *HttpError {
 	causes := make([]interface{}, len(errors), 0)
 	for index := 0; index < len(errors); index++ {
 		causes = append(causes, errors[index].Error())
 	}
 
-	return &RestError{
+	return &HttpError{
 		Message: message,
 		Status:  http.StatusInternalServerError,
 		Error:   "internal_server_error",
