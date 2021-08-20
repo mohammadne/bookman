@@ -2,24 +2,19 @@ package database
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 
 	"github.com/mohammadne/bookman/core/logger"
-	"github.com/mohammadne/bookman/user/internal/models"
 )
 
 type Database interface {
-	Create(user *models.User) error
-	ReadById(id int64) (*models.User, error)
-	ReadByEmailAndPassword(email string, password string) (*models.User, error)
-	Update(old *models.User, new *models.User) error
-	Delete(user *models.User) error
+	UserDatabase
 }
 
 type mysql struct {
 	// injected dependencies
 	config *Config
+	logger *logger.Logger
 
 	// internal dependencies
 	connection *sql.DB
@@ -49,25 +44,5 @@ func NewMysqlDatabase(cfg *Config, log *logger.Logger) Database {
 		return nil
 	}
 
-	return &mysql{config: cfg, connection: client}
-}
-
-func (db *mysql) Create() error {
-	return errors.New("NOT IMPLEMENTED")
-}
-
-func (db *mysql) ReadById(id int64) (*models.User, error) {
-	return nil, errors.New("NOT IMPLEMENTED")
-}
-
-func (db *mysql) ReadByEmailAndPassword(email string, password string) (*models.User, error) {
-	return nil, errors.New("NOT IMPLEMENTED")
-}
-
-func (db *mysql) Update(old *models.User, new *models.User) error {
-	return errors.New("NOT IMPLEMENTED")
-}
-
-func (db *mysql) Delete(user *models.User) error {
-	return errors.New("NOT IMPLEMENTED")
+	return &mysql{config: cfg, logger: log, connection: client}
 }

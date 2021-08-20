@@ -1,7 +1,17 @@
 package errors
 
-type DatabaseError struct{}
+type DbError struct {
+	Message string `json:"message"`
+	Error   string `json:"error"`
+}
 
-func NewNotImplementedDatabaseError() *DatabaseError {
-	return &DatabaseError{}
+func NewDatabaseError(message string, err string) *DbError {
+	return &DbError{
+		Message: message,
+		Error:   err,
+	}
+}
+
+func NewNotImplementedDatabaseError() *DbError {
+	return &DbError{}
 }
