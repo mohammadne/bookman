@@ -92,48 +92,25 @@ func (l *zapLogger) getOptions() []zap.Option {
 }
 
 func (l *zapLogger) Debug(msg string, fields ...logger.Field) {
-	l.instance.Debug(msg, convertField(fields...)...)
+	l.instance.Debug(msg, convertFields(fields...)...)
 }
 
 func (l *zapLogger) Info(msg string, fields ...logger.Field) {
-	l.instance.Info(msg, convertField(fields...)...)
+	l.instance.Info(msg, convertFields(fields...)...)
 }
 
 func (l *zapLogger) Warn(msg string, fields ...logger.Field) {
-	l.instance.Warn(msg, convertField(fields...)...)
+	l.instance.Warn(msg, convertFields(fields...)...)
 }
 
-func (l *zapLogger) Error(msg string, errors ...error) {
-	l.instance.Panic(msg, convertError(errors...)...)
+func (l *zapLogger) Error(msg string, fields ...logger.Field) {
+	l.instance.Error(msg, convertFields(fields...)...)
 }
 
 func (l *zapLogger) Panic(msg string, fields ...logger.Field) {
-	l.instance.Panic(msg, convertField(fields...)...)
+	l.instance.Panic(msg, convertFields(fields...)...)
 }
 
 func (l *zapLogger) Fatal(msg string, fields ...logger.Field) {
-	l.instance.Fatal(msg, convertField(fields...)...)
-}
-
-// convertField converts Field To ZapField
-func convertField(fields ...logger.Field) []zapcore.Field {
-	zapFileds := make([]zapcore.Field, len(fields), 0)
-
-	for index := 0; index < len(fields); index++ {
-		zapField := zap.Any(fields[index].Key, fields[index].Value)
-		zapFileds = append(zapFileds, zapField)
-	}
-
-	return zapFileds
-}
-
-// convertError converts Error To ZapField
-func convertError(errors ...error) []zapcore.Field {
-	zapErrors := make([]zapcore.Field, len(errors), 0)
-
-	for index := 0; index < len(errors); index++ {
-		zapErrors = append(zapErrors, zap.Error(errors[index]))
-	}
-
-	return zapErrors
+	l.instance.Fatal(msg, convertFields(fields...)...)
 }

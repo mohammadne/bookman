@@ -6,10 +6,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	use   = "server"
+	short = "run server"
+)
+
 func Command(cfg *config.Config, log *logger.Logger) *cobra.Command {
 	return &cobra.Command{
-		Use:   "driverServer",
-		Short: "Run driver server",
+		Use:   use,
+		Short: short,
 		Run: func(cmd *cobra.Command, args []string) {
 			main(cfg, log)
 		},

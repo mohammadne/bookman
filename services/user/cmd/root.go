@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	exitFailure = 1
+	errExecuteCMD = "failed to execute root command"
+	exitFailure   = 1
 
 	use   = "bookman_user"
 	short = "short"
@@ -30,7 +31,7 @@ func main() {
 
 	// run cobra root cmd
 	if err := root.Execute(); err != nil {
-		log.Error("failed to execute root command", err)
+		log.Error(errExecuteCMD, logger.Error(err))
 		os.Exit(exitFailure)
 	}
 }
