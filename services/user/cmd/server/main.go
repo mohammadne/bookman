@@ -1,8 +1,8 @@
 package server
 
 import (
+	"github.com/mohammadne/bookman/core/logger"
 	"github.com/mohammadne/bookman/user/config"
-	"github.com/mohammadne/bookman/user/pkg/logger"
 	"github.com/spf13/cobra"
 )
 

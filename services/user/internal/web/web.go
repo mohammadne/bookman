@@ -2,7 +2,7 @@ package web
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/mohammadne/bookman/user/pkg/logger"
+	"github.com/mohammadne/bookman/core/logger"
 )
 
 type WebHandler interface {

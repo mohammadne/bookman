@@ -3,10 +3,10 @@ package main
 import (
 	"os"
 
+	loggerPKG "github.com/mohammadne/bookman/core/logger"
 	"github.com/mohammadne/bookman/user/cmd/server"
 	"github.com/mohammadne/bookman/user/config"
-	"github.com/mohammadne/bookman/user/internal/logger"
-	loggerPKG "github.com/mohammadne/bookman/user/pkg/logger"
+	"github.com/mohammadne/bookman/user/pkg/logger"
 	"github.com/spf13/cobra"
 )
 

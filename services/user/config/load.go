@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/kelseyhightower/envconfig"
-	"github.com/mohammadne/bookman/user/internal/logger"
+	"github.com/mohammadne/bookman/user/pkg/logger"
 )
 
 func Load(e Environment) *Config {
