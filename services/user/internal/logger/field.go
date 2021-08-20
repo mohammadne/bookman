@@ -36,28 +36,3 @@ func convertField(field logger.Field) zapcore.Field {
 
 	return zapcore.Field{}
 }
-
-// Unknown constructs a field with the given key and value.
-func Unknown(key string, val interface{}) logger.Field {
-	return logger.Field{Key: key, Value: val, Type: logger.UnknownType}
-}
-
-// Int constructs a field with the given key and value.
-func Int(key string, val int) logger.Field {
-	return logger.Field{Key: key, Value: val, Type: logger.IntType}
-}
-
-// Float constructs a field with the given key and value.
-func Float64(key string, val float64) logger.Field {
-	return logger.Field{Key: key, Value: val, Type: logger.Float64Type}
-}
-
-// String constructs a field with the given key and value.
-func String(key string, val string) logger.Field {
-	return logger.Field{Key: key, Value: val, Type: logger.StringType}
-}
-
-// Error constructs a field with the given key and value.
-func Error(val error) logger.Field {
-	return logger.Field{Key: "error", Value: val, Type: logger.ErrorType}
-}

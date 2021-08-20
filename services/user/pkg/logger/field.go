@@ -16,3 +16,28 @@ type Field struct {
 	Value interface{}
 	Type  FieldType
 }
+
+// Unknown constructs a field with the given key and value.
+func Unknown(key string, val interface{}) Field {
+	return Field{Key: key, Value: val, Type: UnknownType}
+}
+
+// Int constructs a field with the given key and value.
+func Int(key string, val int) Field {
+	return Field{Key: key, Value: val, Type: IntType}
+}
+
+// Float constructs a field with the given key and value.
+func Float64(key string, val float64) Field {
+	return Field{Key: key, Value: val, Type: Float64Type}
+}
+
+// String constructs a field with the given key and value.
+func String(key string, val string) Field {
+	return Field{Key: key, Value: val, Type: StringType}
+}
+
+// Error constructs a field with the given key and value.
+func Error(val error) Field {
+	return Field{Key: "error", Value: val, Type: ErrorType}
+}

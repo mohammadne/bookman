@@ -6,6 +6,7 @@ import (
 	"github.com/mohammadne/bookman/user/cmd/server"
 	"github.com/mohammadne/bookman/user/config"
 	"github.com/mohammadne/bookman/user/internal/logger"
+	loggerPKG "github.com/mohammadne/bookman/user/pkg/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +32,7 @@ func main() {
 
 	// run cobra root cmd
 	if err := root.Execute(); err != nil {
-		log.Error(errExecuteCMD, logger.Error(err))
+		log.Error(errExecuteCMD, loggerPKG.Error(err))
 		os.Exit(exitFailure)
 	}
 }
