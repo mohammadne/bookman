@@ -23,7 +23,11 @@ const (
 )
 
 var (
-	errCreateUser = errors.NewDatabaseError("error when tying to create user", "database error")
+	errCreateUser                 = errors.NewDatabaseError("error when tying to create user")
+	errReadUserById               = errors.NewDatabaseError("error when tying to read user")
+	errReadUserByEmailAndPassword = errors.NewDatabaseError("error when tying to create user")
+	errUpdateUser                 = errors.NewDatabaseError("error when tying to create user")
+	errDeleteUser                 = errors.NewDatabaseError("error when tying to create user")
 )
 
 func (db *mysql) CreateUser(user *models.User) *errors.DbError {
@@ -50,7 +54,22 @@ func (db *mysql) CreateUser(user *models.User) *errors.DbError {
 }
 
 func (db *mysql) ReadUserById(id int64) (*models.User, *errors.DbError) {
-	return nil, errors.NewNotImplementedDatabaseError()
+	stmt, err := db.connection.Prepare(queryReadUserById)
+	if err != nil {
+		(*db.logger).Error("error when trying to prepare read user statement", logger.Error(err))
+		return nil, errReadUserById
+	}
+	defer stmt.Close()
+
+	user := new(models.User)
+	result := stmt.QueryRow(id)
+	err = result.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated)
+	if err != nil {
+		(*db.logger).Error("error when trying to read user by id", logger.Error(err))
+		return nil, errReadUserById
+	}
+
+	return user, nil
 }
 
 func (db *mysql) ReadUserByEmailAndPassword(e string, p string) (*models.User, *errors.DbError) {
