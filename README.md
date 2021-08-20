@@ -30,7 +30,7 @@ is user managment service
 - `Auth Service`
 is authentication service
 
-- `Inventory Service`
+- `Book Service`
 will list all availables books
 
 - `Rent Service`
