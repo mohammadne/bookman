@@ -43,7 +43,7 @@ func loadDev() *Config {
 		Database: &database.Config{
 			Username: "root",
 			Password: "password",
-			Host:     "localhost:3306",
+			Host:     "127.0.0.1:3306",
 			Schema:   "bookman_user",
 		},
 		Web: &web.Config{
