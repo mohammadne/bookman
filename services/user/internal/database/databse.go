@@ -46,6 +46,7 @@ func NewMysqlDatabase(cfg *Config, log *logger.Logger) Database {
 		return nil
 	}
 
+	// check client connection (ping it)
 	if err = client.Ping(); err != nil {
 		(*log).Fatal(errPingDatabse, logger.Error(err))
 		return nil

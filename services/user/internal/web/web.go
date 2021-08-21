@@ -25,6 +25,8 @@ func NewEcho(cfg *Config, log *logger.Logger, db *database.Database) Web {
 	handler := &echoWebHandler{config: cfg, logger: log, database: db}
 
 	handler.instance = echo.New()
+	handler.instance.HideBanner = true
+
 	handler.instance.GET("/users/:id", handler.get)
 
 	return handler
