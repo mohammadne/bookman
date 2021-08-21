@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/mohammadne/bookman/core/logger"
 	"github.com/mohammadne/bookman/user/config"
+	"github.com/mohammadne/bookman/user/internal/database"
 	"github.com/spf13/cobra"
 )
 
@@ -22,5 +23,5 @@ func Command(cfg *config.Config, log *logger.Logger) *cobra.Command {
 }
 
 func main(cfg *config.Config, log *logger.Logger) {
-
+	db := database.NewMysqlDatabase(cfg.Database, log)
 }

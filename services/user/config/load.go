@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/kelseyhightower/envconfig"
+	"github.com/mohammadne/bookman/user/internal/database"
 	"github.com/mohammadne/bookman/user/pkg/logger"
 )
 
@@ -23,6 +24,7 @@ func loadProd() (cfg *Config) {
 	// process
 	envconfig.MustProcess("bookman_user", cfg)
 	envconfig.MustProcess("bookman_user_logger", cfg.Logger)
+	envconfig.MustProcess("bookman_user_database", cfg.Logger)
 
 	return cfg
 }
@@ -35,6 +37,12 @@ func loadDev() *Config {
 			EnableStacktrace: false,
 			Encoding:         "console",
 			Level:            "warn",
+		},
+		Database: &database.Config{
+			Username: "root",
+			Password: "password",
+			Host:     "localhost:3306",
+			Schema:   "bookman_user",
 		},
 	}
 }
