@@ -3,37 +3,44 @@ package web
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/mohammadne/bookman/core/logger"
+	"github.com/mohammadne/bookman/user/internal/database"
 )
 
 type Web interface {
-	Initialize()
 	Start()
+	StartG()
 }
 
 type echoWebHandler struct {
 	// injected parameters
-	config *Config
-	logger *logger.Logger
+	config   *Config
+	logger   *logger.Logger
+	database *database.Database
 
 	// internal dependencies
 	instance *echo.Echo
 }
 
-func NewEcho(cfg *Config, log *logger.Logger) Web {
-	return &echoWebHandler{config: cfg, logger: log}
-}
+func NewEcho(cfg *Config, log *logger.Logger, db *database.Database) Web {
+	handler := &echoWebHandler{config: cfg, logger: log, database: db}
 
-func (wh *echoWebHandler) Initialize() {
-	wh.instance = echo.New()
+	handler.instance = echo.New()
+	handler.instance.GET("/users/:id", handler.get)
 
-	wh.instance.GET("/users/:id", wh.get)
+	return handler
 }
 
 func (wh *echoWebHandler) Start() {
-	wh.instance.Start(wh.config.URL)
-
 	(*wh.logger).Info(
-		"server started",
+		"starting server",
 		logger.String("address", wh.config.URL),
 	)
+
+	if err := wh.instance.Start(wh.config.URL); err != nil {
+		(*wh.logger).Fatal("starting server failed", logger.Error(err))
+	}
+}
+
+func (wh *echoWebHandler) StartG() {
+	go func() { wh.Start() }()
 }

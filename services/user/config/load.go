@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/mohammadne/bookman/user/internal/database"
+	"github.com/mohammadne/bookman/user/internal/web"
 	"github.com/mohammadne/bookman/user/pkg/logger"
 )
 
@@ -25,6 +26,7 @@ func loadProd() (cfg *Config) {
 	envconfig.MustProcess("bookman_user", cfg)
 	envconfig.MustProcess("bookman_user_logger", cfg.Logger)
 	envconfig.MustProcess("bookman_user_database", cfg.Logger)
+	envconfig.MustProcess("bookman_user_web", cfg.Logger)
 
 	return cfg
 }
@@ -43,6 +45,9 @@ func loadDev() *Config {
 			Password: "password",
 			Host:     "localhost:3306",
 			Schema:   "bookman_user",
+		},
+		Web: &web.Config{
+			URL: "localhost:8080",
 		},
 	}
 }

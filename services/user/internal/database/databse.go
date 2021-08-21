@@ -4,11 +4,17 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/mohammadne/bookman/core/errors"
 	"github.com/mohammadne/bookman/core/logger"
+	"github.com/mohammadne/bookman/user/internal/models"
 )
 
 type Database interface {
-	UserDatabase
+	CreateUser(user *models.User) *errors.DbError
+	ReadUserById(id int64) (*models.User, *errors.DbError)
+	ReadUserByEmailAndPassword(email string, password string) (*models.User, *errors.DbError)
+	UpdateUser(user *models.User) *errors.DbError
+	DeleteUser(user *models.User) *errors.DbError
 }
 
 type mysql struct {

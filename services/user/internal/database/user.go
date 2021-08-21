@@ -6,14 +6,6 @@ import (
 	"github.com/mohammadne/bookman/user/internal/models"
 )
 
-type UserDatabase interface {
-	CreateUser(user *models.User) *errors.DbError
-	ReadUserById(id int64) (*models.User, *errors.DbError)
-	ReadUserByEmailAndPassword(email string, password string) (*models.User, *errors.DbError)
-	UpdateUser(user *models.User) *errors.DbError
-	DeleteUser(user *models.User) *errors.DbError
-}
-
 const (
 	queryCreateUser                 = "INSERT INTO users(first_name, last_name, email, date_created, password) VALUES(?, ?, ?, ?, ?, ?);"
 	queryReadUserById               = "SELECT id, first_name, last_name, email, date_created, FROM users WHERE id=?;"
