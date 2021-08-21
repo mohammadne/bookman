@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/mohammadne/bookman/core/errors"
 	"github.com/mohammadne/bookman/core/logger"
 	"github.com/mohammadne/bookman/user/internal/models"

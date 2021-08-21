@@ -8,7 +8,7 @@ import (
 
 // convertFields converts Field To ZapField
 func convertFields(fields ...logger.Field) []zapcore.Field {
-	zapFileds := make([]zapcore.Field, len(fields), 0)
+	zapFileds := make([]zapcore.Field, 0, len(fields))
 
 	for index := 0; index < len(fields); index++ {
 		zapField := convertField(fields[index])
