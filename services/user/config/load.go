@@ -44,7 +44,7 @@ func loadDev() *Config {
 			Username: "root",
 			Password: "password",
 			Host:     "127.0.0.1:3306",
-			Schema:   "bookman_user",
+			Schema:   "bookman_users",
 		},
 		Web: &web.Config{
 			URL: "localhost:8080",
