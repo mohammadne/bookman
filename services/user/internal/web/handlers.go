@@ -23,7 +23,7 @@ func (wh *echoWebHandler) get(ctx echo.Context) error {
 
 	user, readErr := wh.database.ReadUserById(id)
 	if readErr != nil {
-		return ctx.String(http.StatusBadRequest, "bad request")
+		return ctx.JSON(readErr.Status(), readErr)
 	}
 
 	return ctx.JSON(http.StatusOK, user)

@@ -1,6 +1,8 @@
 package database
 
 import (
+	"database/sql"
+
 	"github.com/mohammadne/bookman/core/failures"
 	"github.com/mohammadne/bookman/core/logger"
 	"github.com/mohammadne/bookman/user/internal/models"
@@ -14,20 +16,17 @@ const (
 	queryDeleteUser                 = "DELETE FROM users WHERE id=?;"
 )
 
-const (
-	errCreateUser                 = "error when tying to create user"
-	errReadUserById               = "error when tying to read user"
-	errReadUserByEmailAndPassword = "error when tying to read user"
-	errUpdateUser                 = "error when tying to update user"
-	errDeleteUser                 = "error when tying to delete user"
-)
-
 var (
-	failureCreateUser                 = failures.Database{}.NewInternalServer(errCreateUser)
-	failureReadUserById               = failures.Database{}.NewInternalServer(errReadUserById)
-	failureReadUserByEmailAndPassword = failures.Database{}.NewInternalServer(errReadUserByEmailAndPassword)
-	failureUpdateUser                 = failures.Database{}.NewInternalServer(errUpdateUser)
-	failureDeleteUser                 = failures.Database{}.NewInternalServer(errDeleteUser)
+	failureCreateUser = failures.Database{}.NewInternalServer("error when tying to create user")
+
+	failureReadUserById         = failures.Database{}.NewInternalServer("error when tying to read user")
+	failureReadUserByIdNotFound = failures.Database{}.NewInternalServer("there is no user with requested ID")
+
+	failureReadUserByEmailAndPassword = failures.Database{}.NewInternalServer("error when tying to read user")
+
+	failureUpdateUser = failures.Database{}.NewInternalServer("error when tying to update user")
+
+	failureDeleteUser = failures.Database{}.NewInternalServer("error when tying to delete user")
 )
 
 func (db *mysql) CreateUser(user *models.User) failures.Failure {
@@ -65,6 +64,10 @@ func (db *mysql) ReadUserById(id int64) (*models.User, failures.Failure) {
 	result := stmt.QueryRow(id)
 	err = result.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, failureReadUserByIdNotFound
+		}
+
 		db.logger.Error("error when trying to read user by id", logger.Error(err))
 		return nil, failureReadUserById
 	}
