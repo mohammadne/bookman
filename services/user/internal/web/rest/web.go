@@ -1,4 +1,4 @@
-package web
+package rest
 
 import (
 	"github.com/labstack/echo/v4"
@@ -6,12 +6,12 @@ import (
 	"github.com/mohammadne/bookman/user/internal/database"
 )
 
-type Web interface {
+type RestAPI interface {
 	Start()
 	StartG()
 }
 
-type echoWebHandler struct {
+type echoRestAPI struct {
 	// injected parameters
 	config   *Config
 	logger   logger.Logger
@@ -21,8 +21,8 @@ type echoWebHandler struct {
 	instance *echo.Echo
 }
 
-func NewEcho(cfg *Config, log logger.Logger, db database.Database) Web {
-	handler := &echoWebHandler{config: cfg, logger: log, database: db}
+func NewEcho(cfg *Config, log logger.Logger, db database.Database) RestAPI {
+	handler := &echoRestAPI{config: cfg, logger: log, database: db}
 
 	handler.instance = echo.New()
 	handler.instance.HideBanner = true
@@ -33,17 +33,17 @@ func NewEcho(cfg *Config, log logger.Logger, db database.Database) Web {
 	return handler
 }
 
-func (wh *echoWebHandler) Start() {
-	wh.logger.Info(
+func (rest *echoRestAPI) Start() {
+	rest.logger.Info(
 		"starting server",
-		logger.String("address", wh.config.URL),
+		logger.String("address", rest.config.URL),
 	)
 
-	if err := wh.instance.Start(wh.config.URL); err != nil {
-		wh.logger.Fatal("starting server failed", logger.Error(err))
+	if err := rest.instance.Start(rest.config.URL); err != nil {
+		rest.logger.Fatal("starting server failed", logger.Error(err))
 	}
 }
 
-func (wh *echoWebHandler) StartG() {
-	go func() { wh.Start() }()
+func (rest *echoRestAPI) StartG() {
+	go func() { rest.Start() }()
 }

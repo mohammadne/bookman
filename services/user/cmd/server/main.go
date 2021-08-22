@@ -4,7 +4,7 @@ import (
 	"github.com/mohammadne/bookman/core/logger"
 	"github.com/mohammadne/bookman/user/config"
 	"github.com/mohammadne/bookman/user/internal/database"
-	"github.com/mohammadne/bookman/user/internal/web"
+	"github.com/mohammadne/bookman/user/internal/web/rest"
 	"github.com/spf13/cobra"
 )
 
@@ -30,7 +30,7 @@ func main(cfg *config.Config, log logger.Logger) {
 	db := database.NewMysqlDatabase(cfg.Database, log)
 
 	// start to Handle http endpoints
-	web := web.NewEcho(cfg.Web, log, db)
+	web := rest.NewEcho(cfg.Rest, log, db)
 	web.StartG()
 
 	// pause main groutine

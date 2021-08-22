@@ -1,4 +1,4 @@
-package web
+package rest
 
 // Config is web configuration
 type Config struct {

@@ -3,7 +3,7 @@ package config
 import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/mohammadne/bookman/user/internal/database"
-	"github.com/mohammadne/bookman/user/internal/web"
+	"github.com/mohammadne/bookman/user/internal/web/rest"
 	"github.com/mohammadne/bookman/user/pkg/logger"
 )
 
@@ -46,7 +46,7 @@ func loadDev() *Config {
 			Host:     "127.0.0.1:3306",
 			Schema:   "bookman",
 		},
-		Web: &web.Config{
+		Rest: &rest.Config{
 			URL: "localhost:8080",
 		},
 	}

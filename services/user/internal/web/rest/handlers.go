@@ -1,4 +1,4 @@
-package web
+package rest
 
 import (
 	"net/http"
@@ -8,20 +8,20 @@ import (
 )
 
 // get is responsible to provide HTTP Get Location functionality
-func (wh *echoWebHandler) get(ctx echo.Context) error {
+func (rest *echoRestAPI) get(ctx echo.Context) error {
 	idStr := ctx.Param("id")
 	if idStr == "" {
-		wh.logger.Error("user id is nil")
+		rest.logger.Error("user id is nil")
 		return ctx.String(http.StatusBadRequest, "bad request")
 	}
 
 	id, parseErr := strconv.ParseInt(idStr, 10, 64)
 	if parseErr != nil {
-		wh.logger.Error("user id is malformed")
+		rest.logger.Error("user id is malformed")
 		return ctx.String(http.StatusBadRequest, "bad request")
 	}
 
-	user, readErr := wh.database.ReadUserById(id)
+	user, readErr := rest.database.ReadUserById(id)
 	if readErr != nil {
 		return ctx.JSON(readErr.Status(), readErr)
 	}
@@ -29,6 +29,6 @@ func (wh *echoWebHandler) get(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, user)
 }
 
-func (wh *echoWebHandler) getMe(ctx echo.Context) error {
+func (rest *echoRestAPI) getMe(ctx echo.Context) error {
 	return nil
 }
