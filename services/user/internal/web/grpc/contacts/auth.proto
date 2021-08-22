@@ -1,0 +1,15 @@
+syntax = "proto3";
+option go_package = "github.com/mohammadne/bookman/user/internal/web/grpc/contracts";
+package contracts;
+
+message UserOfTokenContract {
+    string Token = 1;
+}
+
+message UserOfTokenResponse {
+    int64 Id = 1;
+}
+
+service Auth {
+    rpc UserOfToken(UserOfTokenContract) returns (UserOfTokenResponse) {}
+}
