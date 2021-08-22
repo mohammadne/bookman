@@ -12,7 +12,9 @@ const (
 	queryReadUserByEmailAndPassword = "SELECT id, first_name, last_name, email, date_created FROM users WHERE email=? AND password=?"
 	queryUpdateUser                 = "UPDATE users SET first_name=?, last_name=?, email=? WHERE id=?;"
 	queryDeleteUser                 = "DELETE FROM users WHERE id=?;"
+)
 
+const (
 	errCreateUser                 = "error when tying to create user"
 	errReadUserById               = "error when tying to read user"
 	errReadUserByEmailAndPassword = "error when tying to read user"
@@ -20,25 +22,32 @@ const (
 	errDeleteUser                 = "error when tying to delete user"
 )
 
+var (
+	failureCreateUser                 = failures.Database{}.NewInternalServer(errCreateUser)
+	failureReadUserById               = failures.Database{}.NewInternalServer(errReadUserById)
+	failureReadUserByEmailAndPassword = failures.Database{}.NewInternalServer(errReadUserByEmailAndPassword)
+	failureUpdateUser                 = failures.Database{}.NewInternalServer(errUpdateUser)
+	failureDeleteUser                 = failures.Database{}.NewInternalServer(errDeleteUser)
+)
+
 func (db *mysql) CreateUser(user *models.User) failures.Failure {
 	stmt, err := db.connection.Prepare(queryCreateUser)
 	if err != nil {
 		db.logger.Error("error when trying to prepare create user statement", logger.Error(err))
-		// return failures.Database{}.NewNotImplemented()
-		return errCreateUser
+		return failureCreateUser
 	}
 	defer stmt.Close()
 
 	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.DateCreated, user.Password)
 	if err != nil {
 		db.logger.Error("error when trying to create user", logger.Error(err))
-		return errCreateUser
+		return failureCreateUser
 	}
 
 	user.Id, err = insertResult.LastInsertId()
 	if err != nil {
 		db.logger.Error("error when trying to get last insert id after creating a new user", logger.Error(err))
-		return errCreateUser
+		return failureCreateUser
 	}
 
 	return nil
@@ -48,7 +57,7 @@ func (db *mysql) ReadUserById(id int64) (*models.User, failures.Failure) {
 	stmt, err := db.connection.Prepare(queryReadUserById)
 	if err != nil {
 		db.logger.Error("error when trying to prepare read user statement", logger.Error(err))
-		return nil, errReadUserById
+		return nil, failureReadUserById
 	}
 	defer stmt.Close()
 
@@ -57,7 +66,7 @@ func (db *mysql) ReadUserById(id int64) (*models.User, failures.Failure) {
 	err = result.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated)
 	if err != nil {
 		db.logger.Error("error when trying to read user by id", logger.Error(err))
-		return nil, errReadUserById
+		return nil, failureReadUserById
 	}
 
 	return user, nil
@@ -67,7 +76,7 @@ func (db *mysql) ReadUserByEmailAndPassword(e string, p string) (*models.User, f
 	stmt, err := db.connection.Prepare(queryReadUserByEmailAndPassword)
 	if err != nil {
 		db.logger.Error("error when trying to prepare read user statement", logger.Error(err))
-		return nil, errReadUserByEmailAndPassword
+		return nil, failureReadUserByEmailAndPassword
 	}
 	defer stmt.Close()
 
@@ -76,7 +85,7 @@ func (db *mysql) ReadUserByEmailAndPassword(e string, p string) (*models.User, f
 	err = result.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated)
 	if err != nil {
 		db.logger.Error("error when trying to read user by email and password", logger.Error(err))
-		return nil, errReadUserByEmailAndPassword
+		return nil, failureReadUserByEmailAndPassword
 	}
 
 	return user, nil
@@ -86,14 +95,14 @@ func (db *mysql) UpdateUser(user *models.User) failures.Failure {
 	stmt, err := db.connection.Prepare(queryUpdateUser)
 	if err != nil {
 		db.logger.Error("error when trying to prepare update user statement", logger.Error(err))
-		return errUpdateUser
+		return failureUpdateUser
 	}
 	defer stmt.Close()
 
 	_, err = stmt.Exec(user.FirstName, user.LastName, user.Email, user.Id)
 	if err != nil {
 		db.logger.Error("error when trying to update user", logger.Error(err))
-		return errUpdateUser
+		return failureUpdateUser
 	}
 
 	return nil
@@ -103,13 +112,13 @@ func (db *mysql) DeleteUser(user *models.User) failures.Failure {
 	stmt, err := db.connection.Prepare(queryDeleteUser)
 	if err != nil {
 		db.logger.Error("error when trying to prepare delete user statement", logger.Error(err))
-		return errDeleteUser
+		return failureDeleteUser
 	}
 	defer stmt.Close()
 
 	if _, err = stmt.Exec(user.Id); err != nil {
 		db.logger.Error("error when trying to delete user", logger.Error(err))
-		return errDeleteUser
+		return failureDeleteUser
 	}
 
 	return nil
