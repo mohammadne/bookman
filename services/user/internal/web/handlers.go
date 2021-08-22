@@ -2,23 +2,33 @@ package web
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
-	"github.com/mohammadne/bookman/user/internal/models"
 )
 
-// Get is responsible to provide HTTP Get Location functionality
+// get is responsible to provide HTTP Get Location functionality
 func (wh *echoWebHandler) get(ctx echo.Context) error {
-	user := &models.User{
-		Id:        1,
-		FirstName: "mohammad",
-		LastName:  "Nasr",
+	idStr := ctx.Param("id")
+	if idStr == "" {
+		wh.logger.Error("user id is nil")
+		return ctx.String(http.StatusBadRequest, "bad request")
 	}
 
-	err := (*wh.database).CreateUser(user)
-	if err != nil {
-		(*wh.logger).Fatal("fatal")
+	id, parseErr := strconv.ParseInt(idStr, 10, 64)
+	if parseErr != nil {
+		wh.logger.Error("user id is malformed")
+		return ctx.String(http.StatusBadRequest, "bad request")
+	}
+
+	user, readErr := wh.database.ReadUserById(id)
+	if readErr != nil {
+		return ctx.String(http.StatusBadRequest, "bad request")
 	}
 
 	return ctx.JSON(http.StatusOK, user)
+}
+
+func (wh *echoWebHandler) getMe(ctx echo.Context) error {
+	return nil
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	loggerPKG "github.com/mohammadne/bookman/core/logger"
+	coreLogger "github.com/mohammadne/bookman/core/logger"
 	"github.com/mohammadne/bookman/user/cmd/server"
 	"github.com/mohammadne/bookman/user/config"
 	"github.com/mohammadne/bookman/user/pkg/logger"
@@ -27,12 +27,12 @@ func main() {
 	root := &cobra.Command{Use: use, Short: short, Long: long}
 
 	// register server sub-command
-	serverCMD := server.Command(cfg, &log)
+	serverCMD := server.Command(cfg, log)
 	root.AddCommand(serverCMD)
 
 	// run cobra root cmd
 	if err := root.Execute(); err != nil {
-		log.Error(errExecuteCMD, loggerPKG.Error(err))
+		log.Error(errExecuteCMD, coreLogger.Error(err))
 		os.Exit(exitFailure)
 	}
 }
