@@ -20,6 +20,7 @@ type User struct {
 	Password string `json:"password"`
 }
 
+// TODO: REMOVE IT
 var sampleUser = User{
 	ID:       1,
 	Email:    "email",
@@ -42,5 +43,15 @@ func (e echoRestAPI) login(ctx echo.Context) error {
 		return ctx.JSON(failureUnprocessableEntity.Status(), failureUnprocessableEntity)
 	}
 
-	return ctx.JSON(http.StatusOK, tokenDetail)
+	saveErr := e.cache.SetTokenDetail(user.ID, tokenDetail)
+	if saveErr != nil {
+		return ctx.JSON(failureUnprocessableEntity.Status(), failureUnprocessableEntity)
+	}
+
+	tokens := map[string]string{
+		"access_token":  tokenDetail.AccessToken.Token,
+		"refresh_token": tokenDetail.RefreshToken.Token,
+	}
+
+	return ctx.JSON(http.StatusOK, tokens)
 }
