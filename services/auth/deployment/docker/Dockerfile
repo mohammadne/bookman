@@ -3,12 +3,12 @@ FROM golang:1.16 AS builder
 WORKDIR /app
 
 # We want to populate the module cache based on the go.{mod,sum} files.
-COPY go.mod ../../.
-COPY go.sum ../../.
+COPY go.mod .
+COPY go.sum .
 
 RUN go mod download
 
-COPY ../../. .
+COPY . .
 
 RUN go build -o ./dist/bookman-auth ./cmd/root.go
 

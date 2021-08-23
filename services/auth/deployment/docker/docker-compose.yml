@@ -14,7 +14,7 @@ services:
 
   bookman-auth:
     build:
-      context: .
+      context: ./../..
       dockerfile: Dockerfile
     ports:
       - 8080:8080
