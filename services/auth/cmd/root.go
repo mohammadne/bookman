@@ -6,7 +6,7 @@ import (
 	"github.com/mohammadne/bookman/auth/cmd/server"
 	"github.com/mohammadne/bookman/auth/config"
 	"github.com/mohammadne/bookman/auth/pkg/logger"
-	coreLogger "github.com/mohammadne/bookman/core/logger"
+	coreLogger "github.com/mohammadne/go-pkgs/logger"
 	"github.com/spf13/cobra"
 )
 

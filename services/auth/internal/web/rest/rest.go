@@ -4,7 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
-	"github.com/mohammadne/bookman/core/logger"
+	"github.com/mohammadne/go-pkgs/logger"
 )
 
 type Rest interface {

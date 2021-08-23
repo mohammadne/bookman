@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/mohammadne/bookman/core/failures"
+	"github.com/mohammadne/go-pkgs/failures"
 )
 
 var (
