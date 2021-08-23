@@ -23,7 +23,7 @@ var (
 	failureGet        = failures.Database{}.NewInternalServer("error getting value from database")
 )
 
-func New(cfg *Config, l logger.Logger) Cache {
+func NewRedis(cfg *Config, l logger.Logger) Cache {
 	return &redisCache{config: cfg, logger: l}
 }
 

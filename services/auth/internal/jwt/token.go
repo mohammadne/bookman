@@ -4,37 +4,46 @@ import (
 	"os"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	jwtPkg "github.com/golang-jwt/jwt"
 	"github.com/mohammadne/bookman/auth/internal/models"
+	"github.com/mohammadne/bookman/core/logger"
 	uuid "github.com/satori/go.uuid"
 )
 
-const (
-	accessSecretKey  = "ACCESS_SECRET"
-	aceessExpireTime = time.Minute * 15
+type Jwt interface {
+	CreateTokenDetail(userId uint64) (*models.TokenDetails, error)
+}
 
-	refreshSecretKey  = "REFRESH_SECRET"
-	refreshExpireTime = time.Hour * 24 * 7
-)
+type jwt struct {
+	config *Config
+	logger logger.Logger
+}
 
-func CreateTokenDetail(userId uint64) (*models.TokenDetails, error) {
+func New(config *Config, logger logger.Logger) Jwt {
+	return &jwt{config: config, logger: logger}
+}
+
+func (jwt *jwt) CreateTokenDetail(userId uint64) (*models.TokenDetails, error) {
+	accessExpires := time.Duration(jwt.config.AccessExpires) * time.Hour
+	refreshExpires := time.Duration(jwt.config.RefreshExpires) * time.Hour
+
 	tokenDetail := &models.TokenDetails{
 		AccessToken: &models.Token{
 			UUID:    uuid.NewV4().String(),
-			Expires: time.Now().Add(aceessExpireTime).Unix(),
+			Expires: time.Now().Add(accessExpires).Unix(),
 		},
 		RefreshToken: &models.Token{
 			UUID:    uuid.NewV4().String(),
-			Expires: time.Now().Add(refreshExpireTime).Unix(),
+			Expires: time.Now().Add(refreshExpires).Unix(),
 		},
 	}
 
-	accessErr := createToken(userId, accessSecretKey, tokenDetail.AccessToken)
+	accessErr := createToken(userId, jwt.config.AccessSecret, tokenDetail.AccessToken)
 	if accessErr != nil {
 		return nil, accessErr
 	}
 
-	refreshErr := createToken(userId, refreshSecretKey, tokenDetail.RefreshToken)
+	refreshErr := createToken(userId, jwt.config.RefreshSecret, tokenDetail.RefreshToken)
 	if refreshErr != nil {
 		return nil, refreshErr
 	}
@@ -43,7 +52,7 @@ func CreateTokenDetail(userId uint64) (*models.TokenDetails, error) {
 }
 
 func createToken(userId uint64, secretKey string, token *models.Token) error {
-	claims := jwt.MapClaims{
+	claims := jwtPkg.MapClaims{
 		"authorized": true,
 		"token_uuid": token.UUID,
 		"user_id":    userId,
@@ -51,7 +60,7 @@ func createToken(userId uint64, secretKey string, token *models.Token) error {
 	}
 
 	var err error
-	at := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	at := jwtPkg.NewWithClaims(jwtPkg.SigningMethodHS256, claims)
 	token.Token, err = at.SignedString([]byte(os.Getenv(secretKey)))
 	if err != nil {
 		return err

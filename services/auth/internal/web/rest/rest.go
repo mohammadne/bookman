@@ -3,6 +3,7 @@ package rest
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/mohammadne/bookman/auth/internal/cache"
+	"github.com/mohammadne/bookman/auth/internal/jwt"
 	"github.com/mohammadne/bookman/core/logger"
 )
 
@@ -16,13 +17,14 @@ type echoRestAPI struct {
 	config *Config
 	logger logger.Logger
 	cache  cache.Cache
+	jwt    jwt.Jwt
 
 	// internal dependencies
 	instance *echo.Echo
 }
 
-func NewEcho(cfg *Config, log logger.Logger, c cache.Cache) Rest {
-	handler := &echoRestAPI{config: cfg, logger: log, cache: c}
+func NewEcho(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) Rest {
+	handler := &echoRestAPI{config: cfg, logger: log, cache: c, jwt: j}
 
 	handler.instance = echo.New()
 	handler.instance.HideBanner = true
