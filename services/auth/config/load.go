@@ -27,11 +27,11 @@ func loadProd() (cfg *Config) {
 	cfg.Rest = &rest.Config{}
 
 	// process
-	envconfig.MustProcess("bookman_user", cfg)
-	envconfig.MustProcess("bookman_user_logger", cfg.Logger)
-	envconfig.MustProcess("bookman_user_jwt", cfg.Jwt)
-	envconfig.MustProcess("bookman_user_cache", cfg.Cache)
-	envconfig.MustProcess("bookman_user_rest", cfg.Rest)
+	envconfig.MustProcess("bookman_auth", cfg)
+	envconfig.MustProcess("bookman_auth_logger", cfg.Logger)
+	envconfig.MustProcess("bookman_auth_jwt", cfg.Jwt)
+	envconfig.MustProcess("bookman_auth_cache", cfg.Cache)
+	envconfig.MustProcess("bookman_auth_rest", cfg.Rest)
 
 	return cfg
 }
