@@ -12,7 +12,7 @@ COPY ../../. .
 
 RUN go build -o ./dist/bookman-auth ./cmd/root.go
 
-FROM golang AS bin
+FROM golang:1.16 AS bin
 
 WORKDIR /app
 
