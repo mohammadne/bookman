@@ -1,5 +1,5 @@
 # vscode related
-# .vscode
+.vscode
 !.vscode/launch.json
 
 # 
