@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/mohammadne/bookman/auth/internal/jwt"
 	"github.com/mohammadne/bookman/core/failures"
 )
 
@@ -36,10 +37,10 @@ func (e echoRestAPI) login(ctx echo.Context) error {
 		return ctx.JSON(failureInvalidCredentials.Status(), failureInvalidCredentials)
 	}
 
-	token, err := CreateToken(user.ID)
+	tokenDetail, err := jwt.CreateTokenDetail(user.ID)
 	if err != nil {
 		return ctx.JSON(failureUnprocessableEntity.Status(), failureUnprocessableEntity)
 	}
 
-	return ctx.JSON(http.StatusOK, token)
+	return ctx.JSON(http.StatusOK, tokenDetail)
 }

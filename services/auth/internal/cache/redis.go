@@ -2,9 +2,11 @@ package cache
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/mohammadne/bookman/auth/internal/models"
 	"github.com/mohammadne/bookman/core/failures"
 	"github.com/mohammadne/bookman/core/logger"
 )
@@ -17,8 +19,8 @@ const (
 var (
 	failureNotHealthy = failures.Database{}.NewInternalServer("database is not healthy")
 	failureNotFound   = failures.Database{}.NewNotFound("no matching record found in database")
-	failureGet        = failures.Database{}.NewInternalServer("error getting value from database")
 	failureSet        = failures.Database{}.NewInternalServer("error setting value into database")
+	failureGet        = failures.Database{}.NewInternalServer("error getting value from database")
 )
 
 func New(cfg *Config, l logger.Logger) Cache {
@@ -62,33 +64,48 @@ func (rc *redisCache) IsHealthy() failures.Failure {
 	return nil
 }
 
-func (rc *redisCache) Get(id string) (string, failures.Failure) {
-	value, err := rc.instance.Get(rc.context, id).Result()
-	if err != nil {
-		if err == redis.Nil {
-			return "", failureNotFound
-		}
-
-		rc.logger.Error("error getting from redis", logger.Error(err))
-		return "", failureGet
+func (rc *redisCache) SetTokenDetail(userId uint64, td *models.TokenDetails) failures.Failure {
+	if errAccess := rc.setToken(userId, td.AccessToken); errAccess != nil {
+		return failureSet
 	}
 
-	if len(value) == 0 {
-		return "", failureNotFound
-	}
-
-	return value, nil
-}
-
-func (rc *redisCache) Set(id string, body string) failures.Failure {
-	expirationTime := time.Second * time.Duration(rc.config.ExpirationTime)
-	err := rc.instance.Set(rc.context, id, body, expirationTime).Err()
-	if err != nil {
-		rc.logger.Error("error setting into redis", logger.Error(err))
+	if errRefresh := rc.setToken(userId, td.RefreshToken); errRefresh != nil {
 		return failureSet
 	}
 
 	return nil
+}
+
+func (rc *redisCache) setToken(userId uint64, token *models.Token) failures.Failure {
+	value := strconv.Itoa(int(userId))
+	expire := time.Unix(token.Expires, 0).Sub(time.Now())
+
+	err := rc.instance.Set(rc.context, token.UUID, value, expire).Err()
+	if err != nil {
+		rc.logger.Error("error setting token into redis", logger.Error(err))
+		return failureSet
+	}
+
+	return nil
+}
+
+func (rc *redisCache) GetToken(id uint64) (*models.TokenDetails, failures.Failure) {
+	// value, err := rc.instance.Get(rc.context, id).Result()
+	// if err != nil {
+	// 	if err == redis.Nil {
+	// 		return "", failureNotFound
+	// 	}
+
+	// 	rc.logger.Error("error getting from redis", logger.Error(err))
+	// 	return "", failureGet
+	// }
+
+	// if len(value) == 0 {
+	// 	return "", failureNotFound
+	// }
+
+	// return value, nil
+	return nil, nil
 }
 
 // newSingleRedis returns a new `RedisHandler` with a single Redis client.
