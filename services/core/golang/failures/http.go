@@ -36,9 +36,9 @@ func (f *httpFailure) Error() string {
 
 // ==============================================================> constructors
 
-type Http struct{}
+type Rest struct{}
 
-func (h Http) New(message string, status int, causes []string) Failure {
+func (h Rest) New(message string, status int, causes []string) Failure {
 	return &httpFailure{
 		FailureMessage: message,
 		FailureStatus:  status,
@@ -46,7 +46,7 @@ func (h Http) New(message string, status int, causes []string) Failure {
 	}
 }
 
-func (h Http) NewFromBytes(bytes []byte) (Failure, error) {
+func (h Rest) NewFromBytes(bytes []byte) (Failure, error) {
 	failure := new(httpFailure)
 	if err := json.Unmarshal(bytes, failure); err != nil {
 		return nil, errors.New("invalid json")
@@ -55,35 +55,42 @@ func (h Http) NewFromBytes(bytes []byte) (Failure, error) {
 	return failure, nil
 }
 
-func (h Http) NewBadRequest(message string) Failure {
+func (h Rest) NewBadRequest(message string) Failure {
 	return &httpFailure{
 		FailureMessage: message,
 		FailureStatus:  http.StatusBadRequest,
 	}
 }
 
-func (h Http) NewNotFound(message string) Failure {
+func (h Rest) NewNotFound(message string) Failure {
 	return &httpFailure{
 		FailureMessage: message,
 		FailureStatus:  http.StatusNotFound,
 	}
 }
 
-func (h Http) NewUnauthorized(message string) Failure {
+func (h Rest) NewUnauthorized(message string) Failure {
 	return &httpFailure{
 		FailureMessage: message,
 		FailureStatus:  http.StatusUnauthorized,
 	}
 }
 
-func (h Http) NewNotImplemented() Failure {
+func (h Rest) NewUnprocessableEntity(message string) Failure {
+	return &httpFailure{
+		FailureMessage: message,
+		FailureStatus:  http.StatusUnprocessableEntity,
+	}
+}
+
+func (h Rest) NewNotImplemented() Failure {
 	return &httpFailure{
 		FailureMessage: "not implemented",
 		FailureStatus:  http.StatusNotImplemented,
 	}
 }
 
-func (h Http) NewInternalServer(message string, errors ...error) Failure {
+func (h Rest) NewInternalServer(message string, errors ...error) Failure {
 	causes := make([]string, len(errors), 0)
 	for index := 0; index < len(errors); index++ {
 		causes = append(causes, errors[index].Error())
