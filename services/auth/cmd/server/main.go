@@ -5,7 +5,7 @@ import (
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
 	"github.com/mohammadne/bookman/auth/internal/web/rest"
-	"github.com/mohammadne/bookman/core/logger"
+	"github.com/mohammadne/go-pkgs/logger"
 	"github.com/spf13/cobra"
 )
 

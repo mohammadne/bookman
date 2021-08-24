@@ -1,0 +1,16 @@
+syntax = "proto3";
+option go_package = "./";
+package contracts;
+
+message UserOfTokenContract {
+    string Token = 1;
+}
+
+message UserOfTokenResponse {
+    int64 Id = 1;
+}
+
+service Auth {
+    rpc IsTokenValid(UserOfTokenContract) returns (UserOfTokenResponse) {}
+    rpc UserOfToken(UserOfTokenContract) returns (UserOfTokenResponse) {}
+}

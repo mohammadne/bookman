@@ -1,4 +1,4 @@
-FROM golang:1.16 AS builder
+FROM golang:1.16.0 AS builder
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY . .
 
 RUN go build -o ./dist/bookman-auth ./cmd/root.go
 
-FROM golang:1.16 AS bin
+FROM golang:1.16.0 AS bin
 
 WORKDIR /app
 
@@ -22,6 +22,12 @@ RUN apt-get update
 # Copy our static executable.
 COPY --from=builder /app/.env /app/.env
 COPY --from=builder /app/dist/bookman-auth /app/bookman-auth
+
+# sourcing .env file to set environment-variables
+RUN source .env
+
+# removing .env file, because it contains secrets
+RUN rm -f .env
 
 VOLUME /app/downloads
 

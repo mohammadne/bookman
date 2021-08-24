@@ -3,7 +3,7 @@ package logger
 import (
 	"os"
 
-	"github.com/mohammadne/bookman/core/logger"
+	"github.com/mohammadne/go-pkgs/logger"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
