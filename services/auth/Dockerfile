@@ -26,3 +26,5 @@ COPY --from=builder /app/dist/bookman-auth /app/bookman-auth
 VOLUME /app/downloads
 
 ENTRYPOINT ["/app/bookman-auth"]
+
+CMD ["server", "--env=prod"]
