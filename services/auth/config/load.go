@@ -1,8 +1,7 @@
 package config
 
 import (
-	"fmt"
-
+	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
@@ -10,8 +9,15 @@ import (
 	"github.com/mohammadne/bookman/auth/pkg/logger"
 )
 
+const (
+	errLoadEnv = "Error loading .env file"
+)
+
 func Load(e Environment) *Config {
-	fmt.Println(e)
+	// loads environment variables from .env into apllication
+	if err := godotenv.Load(); err != nil {
+		panic(map[string]interface{}{"err": err, "msg": errLoadEnv})
+	}
 
 	switch e {
 	case Production:
