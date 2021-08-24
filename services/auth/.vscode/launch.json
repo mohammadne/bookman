@@ -8,6 +8,7 @@
             "program": "cmd",
             "args": [
                 "server",
+                "--env=dev",
             ]
         }
     ]

@@ -1,11 +1,13 @@
 package server
 
 import (
+	"fmt"
+
 	"github.com/mohammadne/bookman/auth/config"
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
 	"github.com/mohammadne/bookman/auth/internal/web/rest"
-	"github.com/mohammadne/go-pkgs/logger"
+	"github.com/mohammadne/bookman/auth/pkg/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -14,17 +16,29 @@ const (
 	short = "run server"
 )
 
-func Command(cfg *config.Config, log logger.Logger) *cobra.Command {
-	return &cobra.Command{
+func Command() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   use,
 		Short: short,
 		Run: func(cmd *cobra.Command, args []string) {
-			main(cfg, log)
+			env, err := cmd.Flags().GetString("env")
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			main(config.EnvFromFlag(env))
 		},
 	}
+
+	cmd.Flags().StringP("env", "e", "", "setting environment, default is dev")
+
+	return cmd
 }
 
-func main(cfg *config.Config, log logger.Logger) {
+func main(environment config.Environment) {
+	cfg := config.Load(environment)
+	log := logger.NewZap(cfg.Logger)
+
 	// done channel is a trick to pause main groutine
 	done := make(chan struct{})
 

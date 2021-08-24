@@ -23,12 +23,6 @@ RUN apt-get update
 COPY --from=builder /app/.env /app/.env
 COPY --from=builder /app/dist/bookman-auth /app/bookman-auth
 
-# sourcing .env file to set environment-variables
-RUN source .env
-
-# removing .env file, because it contains secrets
-RUN rm -f .env
-
 VOLUME /app/downloads
 
 ENTRYPOINT ["/app/bookman-auth"]

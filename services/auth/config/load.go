@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+
 	"github.com/kelseyhightower/envconfig"
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
@@ -9,6 +11,8 @@ import (
 )
 
 func Load(e Environment) *Config {
+	fmt.Println(e)
+
 	switch e {
 	case Production:
 		return loadProd()
@@ -19,19 +23,20 @@ func Load(e Environment) *Config {
 	return nil
 }
 
-func loadProd() (cfg *Config) {
+func loadProd() *Config {
 	// initialize
+	cfg := new(Config)
 	cfg.Logger = &logger.Config{}
 	cfg.Jwt = &jwt.Config{}
 	cfg.Cache = &cache.Config{}
 	cfg.Rest = &rest.Config{}
 
 	// process
-	envconfig.MustProcess("bookman_auth", cfg)
-	envconfig.MustProcess("bookman_auth_logger", cfg.Logger)
-	envconfig.MustProcess("bookman_auth_jwt", cfg.Jwt)
-	envconfig.MustProcess("bookman_auth_cache", cfg.Cache)
-	envconfig.MustProcess("bookman_auth_rest", cfg.Rest)
+	envconfig.MustProcess("", cfg)
+	envconfig.MustProcess("logger", cfg.Logger)
+	envconfig.MustProcess("jwt", cfg.Jwt)
+	envconfig.MustProcess("cache", cfg.Cache)
+	envconfig.MustProcess("rest", cfg.Rest)
 
 	return cfg
 }
