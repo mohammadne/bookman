@@ -14,6 +14,9 @@ import (
 const (
 	use   = "server"
 	short = "run server"
+
+	// server-cmd flags usage
+	envUsage = "setting environment, default is dev"
 )
 
 func Command() *cobra.Command {
@@ -30,21 +33,27 @@ func Command() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringP("env", "e", "", "setting environment, default is dev")
+	// set server-cmd flags
+	cmd.Flags().StringP("env", "e", "", envUsage)
 
 	return cmd
 }
 
 func main(environment config.Environment) {
-	cfg := config.Load(environment)
-	log := logger.NewZap(cfg.Logger)
-
 	// done channel is a trick to pause main groutine
 	done := make(chan struct{})
 
+	//
+	cfg := config.Load(environment)
+
+	//
+	log := logger.NewZap(cfg.Logger)
+
+	//
 	cache := cache.NewRedis(cfg.Cache, log)
 	cache.Initialize()
 
+	//
 	jwt := jwt.New(cfg.Jwt, log)
 
 	// start to Handle http endpoints
