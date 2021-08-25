@@ -3,7 +3,7 @@ package config
 import (
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
-	"github.com/mohammadne/bookman/auth/internal/web/rest"
+	"github.com/mohammadne/bookman/auth/internal/network/rest"
 	"github.com/mohammadne/bookman/auth/pkg/logger"
 )
 
