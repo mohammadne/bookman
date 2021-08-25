@@ -3,9 +3,9 @@ package database
 import (
 	"database/sql"
 
-	"github.com/mohammadne/bookman/core/failures"
-	"github.com/mohammadne/bookman/core/logger"
 	"github.com/mohammadne/bookman/user/internal/models"
+	"github.com/mohammadne/go-pkgs/failures"
+	"github.com/mohammadne/go-pkgs/logger"
 )
 
 const (

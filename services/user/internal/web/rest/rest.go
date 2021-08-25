@@ -2,8 +2,8 @@ package rest
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/mohammadne/bookman/core/logger"
 	"github.com/mohammadne/bookman/user/internal/database"
+	"github.com/mohammadne/go-pkgs/logger"
 )
 
 type RestAPI interface {

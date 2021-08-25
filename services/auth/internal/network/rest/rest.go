@@ -5,6 +5,7 @@ import (
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
 	"github.com/mohammadne/go-pkgs/logger"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Rest interface {
@@ -33,7 +34,12 @@ func NewEcho(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) Rest {
 }
 
 func (rest *echoRestAPI) SetupRoutes() {
-	rest.instance.POST("/auth/login", rest.login)
+	authGroup := rest.instance.Group("/auth")
+
+	authGroup.POST("/metrics", echo.WrapHandler(promhttp.Handler()))
+	authGroup.POST("/sign_up", rest.signUp)
+	authGroup.POST("/sign_in", rest.signIn)
+	authGroup.POST("/sign_out", rest.signOut)
 }
 
 func (rest *echoRestAPI) Start() {
