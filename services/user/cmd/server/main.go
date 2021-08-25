@@ -5,7 +5,7 @@ import (
 
 	"github.com/mohammadne/bookman/user/config"
 	"github.com/mohammadne/bookman/user/internal/database"
-	"github.com/mohammadne/bookman/user/internal/web/rest"
+	"github.com/mohammadne/bookman/user/internal/network/rest"
 	"github.com/mohammadne/bookman/user/pkg/logger"
 	"github.com/spf13/cobra"
 )
@@ -52,7 +52,8 @@ func main(environment config.Environment) {
 
 	// start to Handle http endpoints
 	web := rest.NewEcho(cfg.Rest, log, db)
-	web.StartG()
+	web.SetupRoutes()
+	web.Start()
 
 	// pause main groutine
 	<-done

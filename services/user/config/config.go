@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/mohammadne/bookman/user/internal/database"
-	"github.com/mohammadne/bookman/user/internal/web/rest"
+	"github.com/mohammadne/bookman/user/internal/network/rest"
 	"github.com/mohammadne/bookman/user/pkg/logger"
 )
 

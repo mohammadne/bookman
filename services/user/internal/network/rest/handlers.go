@@ -8,7 +8,7 @@ import (
 )
 
 // get is responsible to provide HTTP Get Location functionality
-func (rest *echoRestAPI) get(ctx echo.Context) error {
+func (rest *restEcho) getUser(ctx echo.Context) error {
 	idStr := ctx.Param("id")
 	if idStr == "" {
 		rest.logger.Error("user id is nil")
@@ -29,6 +29,6 @@ func (rest *echoRestAPI) get(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, user)
 }
 
-func (rest *echoRestAPI) getMe(ctx echo.Context) error {
+func (rest *restEcho) getMe(ctx echo.Context) error {
 	return nil
 }
