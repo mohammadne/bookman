@@ -1,4 +1,4 @@
-package grpc
+package grpc_server
 
 // Config is web configuration
 type Config struct {

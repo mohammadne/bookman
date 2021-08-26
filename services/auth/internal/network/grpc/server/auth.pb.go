@@ -4,7 +4,7 @@
 // 	protoc        v3.17.3
 // source: auth.proto
 
-package grpc
+package grpc_server
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
