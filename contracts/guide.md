@@ -6,3 +6,5 @@
 
 - protoc --proto_path=. --go_out=. service.proto
 - protoc --proto_path=. --go-grpc_out=. service.proto
+<!-- OR -->
+- protoc --proto_path=. --go_out=. --go-grpc_out=. service.proto

@@ -7,6 +7,7 @@ import (
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
 	"github.com/mohammadne/bookman/auth/internal/network"
+	"github.com/mohammadne/bookman/auth/internal/network/grpc/contracts"
 	"github.com/mohammadne/go-pkgs/logger"
 	grpc "google.golang.org/grpc"
 )
@@ -19,7 +20,6 @@ type grpcServer struct {
 	jwt    jwt.Jwt
 
 	// internal dependencies
-	UnimplementedAuthServer
 	server *grpc.Server
 }
 
@@ -27,7 +27,7 @@ func New(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) network.Serve
 	s := &grpcServer{config: cfg, logger: log, cache: c, jwt: j}
 
 	s.server = grpc.NewServer()
-	RegisterAuthServer(s.server, s)
+	contracts.RegisterAuthServer(s.server, s)
 
 	return s
 }
@@ -41,6 +41,7 @@ func (s *grpcServer) Serve(<-chan struct{}) {
 	s.server.Serve(listener)
 }
 
-func (s *grpcServer) TokenMetadata(context.Context, *TokenContract) (*TokenMetadataResponse, error) {
+func (s *grpcServer) TokenMetadata(context.Context, *contracts.TokenContract,
+) (*contracts.TokenMetadataResponse, error) {
 	return nil, nil
 }
