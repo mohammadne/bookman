@@ -6,6 +6,8 @@ import (
 	"github.com/mohammadne/bookman/auth/config"
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
+	"github.com/mohammadne/bookman/auth/internal/network"
+	"github.com/mohammadne/bookman/auth/internal/network/grpc"
 	"github.com/mohammadne/bookman/auth/internal/network/rest"
 	"github.com/mohammadne/bookman/auth/pkg/logger"
 	"github.com/spf13/cobra"
@@ -45,20 +47,19 @@ func main(environment config.Environment) {
 
 	//
 	cfg := config.Load(environment)
-
-	//
 	log := logger.NewZap(cfg.Logger)
-
-	//
 	cache := cache.NewRedis(cfg.Cache, log)
-	cache.Initialize()
 
 	//
 	jwt := jwt.New(cfg.Jwt, log)
 
-	// start to Handle http endpoints
-	web := rest.NewEcho(cfg.Rest, log, cache, jwt)
-	web.Serve()
+	// start serving application servers
+	for _, server := range []network.Server{
+		rest.New(cfg.Rest, log, cache, jwt),
+		grpc.New(cfg.Grpc, log, cache, jwt),
+	} {
+		go server.Serve(done)
+	}
 
 	// pause main groutine
 	<-done

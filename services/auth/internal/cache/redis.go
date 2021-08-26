@@ -24,20 +24,8 @@ var (
 )
 
 func NewRedis(cfg *Config, l logger.Logger) Cache {
-	return &redisCache{config: cfg, logger: l}
-}
+	rc := &redisCache{config: cfg, logger: l}
 
-type redisCache struct {
-	// passed dependencies
-	config *Config
-	logger logger.Logger
-
-	// internal dependencies
-	context  context.Context
-	instance redis.Cmdable
-}
-
-func (rc *redisCache) Initialize() {
 	rc.context = context.TODO()
 
 	if rc.config.Mode == cluster {
@@ -52,6 +40,18 @@ func (rc *redisCache) Initialize() {
 			logger.String("err:", err.Error()),
 		)
 	}
+
+	return rc
+}
+
+type redisCache struct {
+	// passed dependencies
+	config *Config
+	logger logger.Logger
+
+	// internal dependencies
+	context  context.Context
+	instance redis.Cmdable
 }
 
 func (rc *redisCache) IsHealthy() failures.Failure {

@@ -6,15 +6,12 @@ import (
 
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
+	"github.com/mohammadne/bookman/auth/internal/network"
 	"github.com/mohammadne/go-pkgs/logger"
 	grpc "google.golang.org/grpc"
 )
 
-type Server interface {
-	Serve()
-}
-
-type server struct {
+type grpcServer struct {
 	// injected parameters
 	config *Config
 	logger logger.Logger
@@ -23,27 +20,27 @@ type server struct {
 
 	// internal dependencies
 	UnimplementedAuthServer
-	grpcServer *grpc.Server
+	server *grpc.Server
 }
 
-func NewServer(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) Server {
-	server := &server{config: cfg, logger: log, cache: c, jwt: j}
+func New(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) network.Server {
+	s := &grpcServer{config: cfg, logger: log, cache: c, jwt: j}
 
-	server.grpcServer = grpc.NewServer()
-	RegisterAuthServer(server.grpcServer, server)
+	s.server = grpc.NewServer()
+	RegisterAuthServer(s.server, s)
 
-	return server
+	return s
 }
 
-func (s *server) Serve() {
+func (s *grpcServer) Serve(<-chan struct{}) {
 	listener, err := net.Listen("tcp", s.config.URL)
 	if err != nil {
 		panic(err)
 	}
 
-	s.grpcServer.Serve(listener)
+	s.server.Serve(listener)
 }
 
-func (s *server) TokenMetadata(context.Context, *TokenContract) (*TokenMetadataResponse, error) {
+func (s *grpcServer) TokenMetadata(context.Context, *TokenContract) (*TokenMetadataResponse, error) {
 	return nil, nil
 }

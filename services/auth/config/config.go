@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
+	"github.com/mohammadne/bookman/auth/internal/network/grpc"
 	"github.com/mohammadne/bookman/auth/internal/network/rest"
 	"github.com/mohammadne/bookman/auth/pkg/logger"
 )
@@ -13,4 +14,5 @@ type Config struct {
 	Jwt    *jwt.Config
 	Cache  *cache.Config
 	Rest   *rest.Config
+	Grpc   *grpc.Config
 }

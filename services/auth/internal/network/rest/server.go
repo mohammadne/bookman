@@ -4,15 +4,12 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
+	"github.com/mohammadne/bookman/auth/internal/network"
 	"github.com/mohammadne/go-pkgs/logger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-type Server interface {
-	Serve()
-}
-
-type restEcho struct {
+type restServer struct {
 	// injected parameters
 	config *Config
 	logger logger.Logger
@@ -23,8 +20,8 @@ type restEcho struct {
 	instance *echo.Echo
 }
 
-func NewEcho(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) Server {
-	handler := &restEcho{config: cfg, logger: log, cache: c, jwt: j}
+func New(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) network.Server {
+	handler := &restServer{config: cfg, logger: log, cache: c, jwt: j}
 
 	handler.instance = echo.New()
 	handler.instance.HideBanner = true
@@ -33,7 +30,7 @@ func NewEcho(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) Server {
 	return handler
 }
 
-func (rest *restEcho) setupRoutes() {
+func (rest *restServer) setupRoutes() {
 	authGroup := rest.instance.Group("/auth")
 
 	authGroup.POST("/metrics", echo.WrapHandler(promhttp.Handler()))
@@ -42,7 +39,7 @@ func (rest *restEcho) setupRoutes() {
 	authGroup.POST("/sign_out", rest.signOut)
 }
 
-func (rest *restEcho) Serve() {
+func (rest *restServer) Serve(<-chan struct{}) {
 	rest.logger.Info(
 		"starting server",
 		logger.String("address", rest.config.URL),

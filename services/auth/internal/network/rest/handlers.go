@@ -26,11 +26,11 @@ var sampleUser = User{
 	Password: "password",
 }
 
-func (e restEcho) signUp(ctx echo.Context) error {
+func (e restServer) signUp(ctx echo.Context) error {
 	return nil
 }
 
-func (e restEcho) signIn(ctx echo.Context) error {
+func (e restServer) signIn(ctx echo.Context) error {
 	user := new(User)
 	if err := ctx.Bind(user); err != nil {
 		return ctx.JSON(failureInvalidBody.Status(), failureInvalidBody)
@@ -59,6 +59,6 @@ func (e restEcho) signIn(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, tokens)
 }
 
-func (e restEcho) signOut(ctx echo.Context) error {
+func (e restServer) signOut(ctx echo.Context) error {
 	return nil
 }

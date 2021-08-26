@@ -6,9 +6,6 @@ import (
 )
 
 type Cache interface {
-	// Initialize is cache-service setup
-	Initialize()
-
 	// IsHealthy checks correctness of service
 	IsHealthy() failures.Failure
 
