@@ -1,0 +1,16 @@
+syntax = "proto3";
+option go_package = "./";
+package contracts;
+
+message UserCredentialContract {
+    string Token = 1;
+}
+
+message UserResponse {
+    int64 Id = 1;
+}
+
+service User {
+    rpc CreateUser(UserCredentialContract) returns (UserResponse) {}
+    rpc GetUser(UserCredentialContract) returns (UserResponse) {}
+}
