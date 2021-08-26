@@ -52,8 +52,7 @@ func main(environment config.Environment) {
 
 	// start to Handle http endpoints
 	web := rest.NewEcho(cfg.Rest, log, db)
-	web.SetupRoutes()
-	web.Start()
+	web.Serve()
 
 	// pause main groutine
 	<-done

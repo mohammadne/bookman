@@ -7,9 +7,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-type Rest interface {
-	SetupRoutes()
-	Start()
+type Server interface {
+	Serve()
 }
 
 type restEcho struct {
@@ -22,19 +21,17 @@ type restEcho struct {
 	instance *echo.Echo
 }
 
-func NewEcho(cfg *Config, log logger.Logger, db database.Database) Rest {
+func NewEcho(cfg *Config, log logger.Logger, db database.Database) Server {
 	handler := &restEcho{config: cfg, logger: log, database: db}
 
 	handler.instance = echo.New()
 	handler.instance.HideBanner = true
-
-	handler.instance.GET("/users/:id", handler.getUser)
-	handler.instance.GET("/users/me", handler.getMe)
+	handler.setupRoutes()
 
 	return handler
 }
 
-func (rest *restEcho) SetupRoutes() {
+func (rest *restEcho) setupRoutes() {
 	authGroup := rest.instance.Group("/users")
 
 	authGroup.POST("/metrics", echo.WrapHandler(promhttp.Handler()))
@@ -42,7 +39,7 @@ func (rest *restEcho) SetupRoutes() {
 	authGroup.POST("/me", rest.getMe)
 }
 
-func (rest *restEcho) Start() {
+func (rest *restEcho) Serve() {
 	rest.logger.Info(
 		"starting server",
 		logger.String("address", rest.config.URL),
