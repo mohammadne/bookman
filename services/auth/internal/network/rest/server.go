@@ -47,5 +47,4 @@ func (rest *restServer) Serve(<-chan struct{}) {
 	if err := rest.instance.Start(rest.config.URL); err != nil {
 		rest.logger.Fatal("starting server failed", logger.Error(err))
 	}
-
 }
