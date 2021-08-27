@@ -41,19 +41,19 @@ func (e restServer) signIn(ctx echo.Context) error {
 		return ctx.JSON(failureInvalidCredentials.Status(), failureInvalidCredentials)
 	}
 
-	tokenDetail, err := e.jwt.CreateTokenDetail(user.ID)
+	jwt, err := e.jwt.CreateJwt(user.ID)
 	if err != nil {
 		return ctx.JSON(failureUnprocessableEntity.Status(), failureUnprocessableEntity)
 	}
 
-	saveErr := e.cache.SetTokenDetail(user.ID, tokenDetail)
+	saveErr := e.cache.SetJwt(user.ID, jwt)
 	if saveErr != nil {
 		return ctx.JSON(failureUnprocessableEntity.Status(), failureUnprocessableEntity)
 	}
 
 	tokens := map[string]string{
-		"access_token":  tokenDetail.AccessToken.Token,
-		"refresh_token": tokenDetail.RefreshToken.Token,
+		"access_token":  jwt.AccessToken.Token,
+		"refresh_token": jwt.RefreshToken.Token,
 	}
 
 	return ctx.JSON(http.StatusOK, tokens)

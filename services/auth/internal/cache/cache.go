@@ -10,8 +10,8 @@ type Cache interface {
 	IsHealthy() failures.Failure
 
 	// SetToken sets body into cahce
-	SetTokenDetail(id uint64, body *models.TokenDetails) failures.Failure
+	SetJwt(id uint64, body *models.Jwt) failures.Failure
 
 	// GetToken gets id-value and put it into body
-	GetToken(id uint64) (*models.TokenDetails, failures.Failure)
+	GetToken(id uint64) (*models.Jwt, failures.Failure)
 }

@@ -64,7 +64,7 @@ func (rc *redisCache) IsHealthy() failures.Failure {
 	return nil
 }
 
-func (rc *redisCache) SetTokenDetail(userId uint64, td *models.TokenDetails) failures.Failure {
+func (rc *redisCache) SetJwt(userId uint64, td *models.Jwt) failures.Failure {
 	if errAccess := rc.setToken(userId, td.AccessToken); errAccess != nil {
 		return failureSet
 	}
@@ -89,7 +89,7 @@ func (rc *redisCache) setToken(userId uint64, token *models.Token) failures.Fail
 	return nil
 }
 
-func (rc *redisCache) GetToken(id uint64) (*models.TokenDetails, failures.Failure) {
+func (rc *redisCache) GetToken(id uint64) (*models.Jwt, failures.Failure) {
 	// value, err := rc.instance.Get(rc.context, id).Result()
 	// if err != nil {
 	// 	if err == redis.Nil {

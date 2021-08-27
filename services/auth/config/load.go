@@ -5,6 +5,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
+	grpc_server "github.com/mohammadne/bookman/auth/internal/network/grpc/server"
 	"github.com/mohammadne/bookman/auth/internal/network/rest"
 	"github.com/mohammadne/bookman/auth/pkg/logger"
 )
@@ -36,6 +37,7 @@ func loadProd() *Config {
 	cfg.Jwt = &jwt.Config{}
 	cfg.Cache = &cache.Config{}
 	cfg.Rest = &rest.Config{}
+	cfg.Grpc = &grpc_server.Config{}
 
 	// process
 	envconfig.MustProcess("", cfg)
@@ -43,6 +45,7 @@ func loadProd() *Config {
 	envconfig.MustProcess("jwt", cfg.Jwt)
 	envconfig.MustProcess("cache", cfg.Cache)
 	envconfig.MustProcess("rest", cfg.Rest)
+	envconfig.MustProcess("grpc_server", cfg.Grpc)
 
 	return cfg
 }
@@ -67,6 +70,9 @@ func loadDev() *Config {
 		},
 		Rest: &rest.Config{
 			URL: "localhost:8080",
+		},
+		Grpc: &grpc_server.Config{
+			URL: "localhost:4040",
 		},
 	}
 }

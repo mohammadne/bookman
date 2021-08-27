@@ -11,7 +11,7 @@ import (
 )
 
 type Jwt interface {
-	CreateTokenDetail(userId uint64) (*models.TokenDetails, error)
+	CreateJwt(userId uint64) (*models.Jwt, error)
 }
 
 type jwt struct {
@@ -23,11 +23,11 @@ func New(config *Config, logger logger.Logger) Jwt {
 	return &jwt{config: config, logger: logger}
 }
 
-func (jwt *jwt) CreateTokenDetail(userId uint64) (*models.TokenDetails, error) {
+func (jwt *jwt) CreateJwt(userId uint64) (*models.Jwt, error) {
 	accessExpires := time.Duration(jwt.config.AccessExpires) * time.Hour
 	refreshExpires := time.Duration(jwt.config.RefreshExpires) * time.Hour
 
-	tokenDetail := &models.TokenDetails{
+	tokenDetail := &models.Jwt{
 		AccessToken: &models.Token{
 			UUID:    uuid.NewV4().String(),
 			Expires: time.Now().Add(accessExpires).Unix(),

@@ -53,7 +53,7 @@ func main(environment config.Environment) {
 	//
 	jwt := jwt.New(cfg.Jwt, log)
 
-	// start serving application servers
+	// serving application servers
 	for _, server := range []network.Server{
 		rest.New(cfg.Rest, log, cache, jwt),
 		grpc_server.New(cfg.Grpc, log, cache, jwt),
