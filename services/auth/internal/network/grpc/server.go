@@ -1,4 +1,4 @@
-package grpc_server
+package grpc
 
 import (
 	context "context"
@@ -23,7 +23,7 @@ type grpcServer struct {
 	server *grpc.Server
 }
 
-func New(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) network.Server {
+func NewServer(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) network.Server {
 	s := &grpcServer{config: cfg, logger: log, cache: c, jwt: j}
 
 	s.server = grpc.NewServer()
@@ -33,7 +33,7 @@ func New(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) network.Serve
 }
 
 func (s *grpcServer) Serve(<-chan struct{}) {
-	listener, err := net.Listen("tcp", s.config.URL)
+	listener, err := net.Listen("tcp", s.config.Url)
 	if err != nil {
 		panic(err)
 	}

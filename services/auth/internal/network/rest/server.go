@@ -5,23 +5,25 @@ import (
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
 	"github.com/mohammadne/bookman/auth/internal/network"
+	grpc_client "github.com/mohammadne/bookman/auth/internal/network/grpc/clients"
 	"github.com/mohammadne/go-pkgs/logger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type restServer struct {
 	// injected parameters
-	config *Config
-	logger logger.Logger
-	cache  cache.Cache
-	jwt    jwt.Jwt
+	config   *Config
+	logger   logger.Logger
+	cache    cache.Cache
+	jwt      jwt.Jwt
+	userGrpc grpc_client.User
 
 	// internal dependencies
 	instance *echo.Echo
 }
 
-func New(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) network.Server {
-	handler := &restServer{config: cfg, logger: log, cache: c, jwt: j}
+func New(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt, ug grpc_client.User) network.Server {
+	handler := &restServer{config: cfg, logger: log, cache: c, jwt: j, userGrpc: ug}
 
 	handler.instance = echo.New()
 	handler.instance.HideBanner = true

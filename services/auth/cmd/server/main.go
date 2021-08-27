@@ -7,7 +7,8 @@ import (
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
 	"github.com/mohammadne/bookman/auth/internal/network"
-	grpc_server "github.com/mohammadne/bookman/auth/internal/network/grpc/server"
+	"github.com/mohammadne/bookman/auth/internal/network/grpc"
+	grpc_client "github.com/mohammadne/bookman/auth/internal/network/grpc/clients"
 	"github.com/mohammadne/bookman/auth/internal/network/rest"
 	"github.com/mohammadne/bookman/auth/pkg/logger"
 	"github.com/spf13/cobra"
@@ -53,10 +54,13 @@ func main(environment config.Environment) {
 	//
 	jwt := jwt.New(cfg.Jwt, log)
 
+	userGrpc := grpc_client.NewUser(cfg.GrpcUser, log)
+	userGrpc.Setup()
+
 	// serving application servers
 	servers := []network.Server{
-		rest.New(cfg.Rest, log, cache, jwt),
-		grpc_server.New(cfg.Grpc, log, cache, jwt),
+		rest.New(cfg.Rest, log, cache, jwt, userGrpc),
+		grpc.NewServer(cfg.GrpcServer, log, cache, jwt),
 	}
 
 	for _, server := range servers {

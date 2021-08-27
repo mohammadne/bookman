@@ -6,25 +6,19 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
+	"github.com/mohammadne/bookman/auth/internal/models"
 	"github.com/mohammadne/go-pkgs/failures"
 )
 
 var (
 	failureInvalidBody         = failures.Rest{}.NewBadRequest("invalid json body provided")
-	failureInvalidCredentials  = failures.Rest{}.NewBadRequest("invalid credentials given")
+	failureNotFound            = failures.Rest{}.NewNotFound("invalid email and password credentials given")
 	failureUnautorized         = failures.Rest{}.NewUnauthorized("unauthorized")
 	failureUnprocessableEntity = failures.Rest{}.NewUnprocessableEntity("unprocessable entity")
 )
 
-type User struct {
-	Id       uint64 `json:"id"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 // TODO: REMOVE IT
-var sampleUser = User{
-	Id:       1,
+var sampleUser = models.UserCredential{
 	Email:    "email",
 	Password: "password",
 }
@@ -34,17 +28,17 @@ func (e restServer) signUp(ctx echo.Context) error {
 }
 
 func (e restServer) signIn(ctx echo.Context) error {
-	user := new(User)
-	if err := ctx.Bind(user); err != nil {
+	userCredential := new(models.UserCredential)
+	if err := ctx.Bind(userCredential); err != nil {
 		return ctx.JSON(failureInvalidBody.Status(), failureInvalidBody)
 	}
 
-	// TODO: compare provided credentials with user-service and check there's a match
-	if user.Email != sampleUser.Email || user.Password != sampleUser.Password {
-		return ctx.JSON(failureInvalidCredentials.Status(), failureInvalidCredentials)
+	userId, err := e.userGrpc.GetUser(userCredential)
+	if err != nil || userId == 0 {
+		return ctx.JSON(failureNotFound.Status(), failureNotFound)
 	}
 
-	tokens, failure := e.generateTokens(user.Id)
+	tokens, failure := e.generateTokens(userId)
 	if failure != nil {
 		return ctx.JSON(failure.Status(), failure)
 	}
