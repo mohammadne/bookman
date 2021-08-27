@@ -5,6 +5,8 @@ import (
 
 	"github.com/mohammadne/bookman/user/config"
 	"github.com/mohammadne/bookman/user/internal/database"
+	"github.com/mohammadne/bookman/user/internal/network"
+	grpc_server "github.com/mohammadne/bookman/user/internal/network/grpc/server"
 	"github.com/mohammadne/bookman/user/internal/network/rest"
 	"github.com/mohammadne/bookman/user/pkg/logger"
 	"github.com/spf13/cobra"
@@ -50,9 +52,15 @@ func main(environment config.Environment) {
 
 	db := database.NewMysqlDatabase(cfg.Database, log)
 
-	// start to Handle http endpoints
-	web := rest.NewEcho(cfg.Rest, log, db)
-	web.Serve()
+	// serving application servers
+	servers := []network.Server{
+		rest.New(cfg.Rest, log, db),
+		grpc_server.New(cfg.Grpc, log, cache, jwt),
+	}
+
+	for _, server := range servers {
+		go server.Serve(done)
+	}
 
 	// pause main groutine
 	<-done

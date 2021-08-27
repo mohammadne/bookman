@@ -7,10 +7,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-type Server interface {
-	Serve()
-}
-
 type restEcho struct {
 	// injected parameters
 	config   *Config
@@ -21,7 +17,7 @@ type restEcho struct {
 	instance *echo.Echo
 }
 
-func NewEcho(cfg *Config, log logger.Logger, db database.Database) Server {
+func New(cfg *Config, log logger.Logger, db database.Database) *restEcho {
 	handler := &restEcho{config: cfg, logger: log, database: db}
 
 	handler.instance = echo.New()
