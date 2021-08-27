@@ -38,12 +38,14 @@ func (s *grpcServer) Serve(<-chan struct{}) {
 	s.server.Serve(listener)
 }
 
+// TODO : FIX HARD CODE
 func (s *grpcServer) CreateUser(context.Context, *contracts.UserCredentialContract,
 ) (*contracts.UserResponse, error) {
-	return nil, nil
+	return &contracts.UserResponse{Id: 1}, nil
 }
 
+// TODO : FIX HARD CODE
 func (s *grpcServer) GetUser(context.Context, *contracts.UserCredentialContract,
 ) (*contracts.UserResponse, error) {
-	return nil, nil
+	return &contracts.UserResponse{Id: 1}, nil
 }
