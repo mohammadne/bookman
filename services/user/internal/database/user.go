@@ -12,7 +12,7 @@ const (
 	queryCreateUser                 = "INSERT INTO users(first_name, last_name, email, date_created, password) VALUES(?, ?, ?, ?, ?);"
 	queryFindUserById               = "SELECT id, first_name, last_name, email, date_created FROM users WHERE id=?;"
 	queryFindUserByEmailAndPassword = "SELECT id, first_name, last_name, email, date_created FROM users WHERE email=? AND password=?"
-	queryFindUserByEmail            = "SELECT id, first_name, last_name, email, date_created FROM users WHERE email=? AND password=?"
+	queryFindUserByEmail            = "SELECT id, first_name, last_name, email, date_created FROM users WHERE email=?"
 	queryUpdateUser                 = "UPDATE users SET first_name=?, last_name=?, email=? WHERE id=?;"
 	queryDeleteUser                 = "DELETE FROM users WHERE id=?;"
 )
@@ -96,8 +96,23 @@ func (db *mysql) FindUserByEmailAndPassword(e string, p string) (*models.User, f
 	return user, nil
 }
 
-func (db *mysql) FindUsersByEmail(email string) ([]models.User, failures.Failure) {
-	return nil, nil
+func (db *mysql) FindUserByEmail(email string) (*models.User, failures.Failure) {
+	stmt, err := db.connection.Prepare(queryFindUserByEmail)
+	if err != nil {
+		db.logger.Error("error when trying to prepare read user statement", logger.Error(err))
+		return nil, failureReadUserByEmailAndPassword
+	}
+	defer stmt.Close()
+
+	user := new(models.User)
+	result := stmt.QueryRow(email)
+	err = result.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated)
+	if err != nil {
+		db.logger.Error("error when trying to read user by email", logger.Error(err))
+		return nil, failureReadUserByEmailAndPassword
+	}
+
+	return user, nil
 }
 
 func (db *mysql) UpdateUser(user *models.User) failures.Failure {

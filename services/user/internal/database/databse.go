@@ -14,7 +14,7 @@ type Database interface {
 	CreateUser(user *models.User) failures.Failure
 	FindUserById(id int64) (*models.User, failures.Failure)
 	FindUserByEmailAndPassword(email string, password string) (*models.User, failures.Failure)
-	FindUsersByEmail(email string) ([]models.User, failures.Failure)
+	FindUserByEmail(email string) (*models.User, failures.Failure)
 	UpdateUser(user *models.User) failures.Failure
 	DeleteUser(user *models.User) failures.Failure
 }

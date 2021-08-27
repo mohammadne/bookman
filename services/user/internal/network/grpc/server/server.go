@@ -7,6 +7,7 @@ import (
 	"github.com/mohammadne/bookman/user/internal/database"
 	"github.com/mohammadne/bookman/user/internal/models"
 	"github.com/mohammadne/bookman/user/internal/network/grpc/contracts"
+	"github.com/mohammadne/go-pkgs/failures"
 	"github.com/mohammadne/go-pkgs/logger"
 	grpc "google.golang.org/grpc"
 )
@@ -42,13 +43,13 @@ func (s *grpcServer) Serve(<-chan struct{}) {
 
 func (s *grpcServer) CreateUser(_ context.Context, credentials *contracts.UserCredentialContract,
 ) (*contracts.UserResponse, error) {
-	userId, err := s.getUserId(credentials)
-	if userId != 0 || err == nil {
-		// already exists
+	user, failure := s.database.FindUserByEmail(credentials.Email)
+	if user != nil || failure == nil {
+		return nil, failures.Rest{}.NewBadRequest("email is already registered")
 	}
 
-	user := new(models.User)
-	failure := s.database.CreateUser(user)
+	user = &models.User{}
+	failure = s.database.CreateUser(user)
 	if failure != nil {
 		return nil, failure
 	}
@@ -58,19 +59,10 @@ func (s *grpcServer) CreateUser(_ context.Context, credentials *contracts.UserCr
 
 func (s *grpcServer) GetUser(_ context.Context, credentials *contracts.UserCredentialContract,
 ) (*contracts.UserResponse, error) {
-	userId, err := s.getUserId(credentials)
-	if err != nil {
-		return nil, err
-	}
-
-	return &contracts.UserResponse{Id: userId}, nil
-}
-
-func (s *grpcServer) getUserId(credentials *contracts.UserCredentialContract) (uint64, error) {
 	user, failure := s.database.FindUserByEmailAndPassword(credentials.Email, credentials.Password)
 	if failure != nil {
-		return 0, failure
+		return nil, failure
 	}
 
-	return uint64(user.Id), nil
+	return &contracts.UserResponse{Id: user.Id}, nil
 }

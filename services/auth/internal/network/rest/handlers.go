@@ -17,28 +17,37 @@ var (
 	failureUnprocessableEntity = failures.Rest{}.NewUnprocessableEntity("unprocessable entity")
 )
 
-// TODO: REMOVE IT
-var sampleUser = models.UserCredential{
-	Email:    "email",
-	Password: "password",
-}
-
-func (e restServer) signUp(ctx echo.Context) error {
-	return nil
-}
-
-func (e restServer) signIn(ctx echo.Context) error {
+func (r restServer) signUp(ctx echo.Context) error {
 	userCredential := new(models.UserCredential)
 	if err := ctx.Bind(userCredential); err != nil {
 		return ctx.JSON(failureInvalidBody.Status(), failureInvalidBody)
 	}
 
-	userId, err := e.userGrpc.GetUser(userCredential)
+	userId, err := r.userGrpc.CreateUser(userCredential)
 	if err != nil || userId == 0 {
 		return ctx.JSON(failureNotFound.Status(), failureNotFound)
 	}
 
-	tokens, failure := e.generateTokens(userId)
+	tokens, failure := r.generateTokens(userId)
+	if failure != nil {
+		return ctx.JSON(failure.Status(), failure)
+	}
+
+	return ctx.JSON(http.StatusOK, tokens)
+}
+
+func (r restServer) signIn(ctx echo.Context) error {
+	userCredential := new(models.UserCredential)
+	if err := ctx.Bind(userCredential); err != nil {
+		return ctx.JSON(failureInvalidBody.Status(), failureInvalidBody)
+	}
+
+	userId, err := r.userGrpc.GetUser(userCredential)
+	if err != nil || userId == 0 {
+		return ctx.JSON(failureNotFound.Status(), failureNotFound)
+	}
+
+	tokens, failure := r.generateTokens(userId)
 	if failure != nil {
 		return ctx.JSON(failure.Status(), failure)
 	}
