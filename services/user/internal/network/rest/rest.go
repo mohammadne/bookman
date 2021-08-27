@@ -35,15 +35,13 @@ func (rest *restEcho) setupRoutes() {
 	authGroup.POST("/me", rest.getMe)
 }
 
-func (rest *restEcho) Serve() {
+func (rest *restEcho) Serve(<-chan struct{}) {
 	rest.logger.Info(
 		"starting server",
 		logger.String("address", rest.config.URL),
 	)
 
-	go func() {
-		if err := rest.instance.Start(rest.config.URL); err != nil {
-			rest.logger.Fatal("starting server failed", logger.Error(err))
-		}
-	}()
+	if err := rest.instance.Start(rest.config.URL); err != nil {
+		rest.logger.Fatal("starting server failed", logger.Error(err))
+	}
 }

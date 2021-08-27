@@ -55,7 +55,7 @@ func main(environment config.Environment) {
 	// serving application servers
 	servers := []network.Server{
 		rest.New(cfg.Rest, log, db),
-		grpc_server.New(cfg.Grpc, log, cache, jwt),
+		grpc_server.New(cfg.Grpc, log, db),
 	}
 
 	for _, server := range servers {

@@ -40,12 +40,12 @@ func loadProd() *Config {
 	cfg.Grpc = &grpc_server.Config{}
 
 	// process
-	envconfig.MustProcess("bookman_auth", cfg)
-	envconfig.MustProcess("bookman_auth_logger", cfg.Logger)
-	envconfig.MustProcess("bookman_auth_jwt", cfg.Jwt)
-	envconfig.MustProcess("bookman_auth_cache", cfg.Cache)
-	envconfig.MustProcess("bookman_auth_rest", cfg.Rest)
-	envconfig.MustProcess("bookman_auth_grpc", cfg.Grpc)
+	envconfig.MustProcess("auth", cfg)
+	envconfig.MustProcess("auth_logger", cfg.Logger)
+	envconfig.MustProcess("auth_jwt", cfg.Jwt)
+	envconfig.MustProcess("auth_cache", cfg.Cache)
+	envconfig.MustProcess("auth_rest", cfg.Rest)
+	envconfig.MustProcess("auth_grpc", cfg.Grpc)
 
 	return cfg
 }
