@@ -39,19 +39,20 @@ func (c *authClient) TokenMetadata(ctx context.Context, in *TokenContract, opts 
 }
 
 // AuthServer is the server API for Auth service.
-// All implementations should embed UnimplementedAuthServer
+// All implementations must embed UnimplementedAuthServer
 // for forward compatibility
 type AuthServer interface {
 	TokenMetadata(context.Context, *TokenContract) (*TokenMetadataResponse, error)
 }
 
-// UnimplementedAuthServer should be embedded to have forward compatible implementations.
+// UnimplementedAuthServer must be embedded to have forward compatible implementations.
 type UnimplementedAuthServer struct {
 }
 
 func (UnimplementedAuthServer) TokenMetadata(context.Context, *TokenContract) (*TokenMetadataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TokenMetadata not implemented")
 }
+func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
 // UnsafeAuthServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to AuthServer will

@@ -10,8 +10,9 @@ import (
 
 const (
 	queryCreateUser                 = "INSERT INTO users(first_name, last_name, email, date_created, password) VALUES(?, ?, ?, ?, ?);"
-	queryReadUserById               = "SELECT id, first_name, last_name, email, date_created FROM users WHERE id=?;"
-	queryReadUserByEmailAndPassword = "SELECT id, first_name, last_name, email, date_created FROM users WHERE email=? AND password=?"
+	queryFindUserById               = "SELECT id, first_name, last_name, email, date_created FROM users WHERE id=?;"
+	queryFindUserByEmailAndPassword = "SELECT id, first_name, last_name, email, date_created FROM users WHERE email=? AND password=?"
+	queryFindUserByEmail            = "SELECT id, first_name, last_name, email, date_created FROM users WHERE email=? AND password=?"
 	queryUpdateUser                 = "UPDATE users SET first_name=?, last_name=?, email=? WHERE id=?;"
 	queryDeleteUser                 = "DELETE FROM users WHERE id=?;"
 )
@@ -19,8 +20,8 @@ const (
 var (
 	failureCreateUser = failures.Database{}.NewInternalServer("error when tying to create user")
 
-	failureReadUserById         = failures.Database{}.NewInternalServer("error when tying to read user")
-	failureReadUserByIdNotFound = failures.Database{}.NewInternalServer("there is no user with requested ID")
+	failureFindUserById         = failures.Database{}.NewInternalServer("error when tying to read user")
+	failureFindUserByIdNotFound = failures.Database{}.NewInternalServer("there is no user with requested ID")
 
 	failureReadUserByEmailAndPassword = failures.Database{}.NewInternalServer("error when tying to read user")
 
@@ -43,20 +44,21 @@ func (db *mysql) CreateUser(user *models.User) failures.Failure {
 		return failureCreateUser
 	}
 
-	user.Id, err = insertResult.LastInsertId()
+	userId, err := insertResult.LastInsertId()
 	if err != nil {
 		db.logger.Error("error when trying to get last insert id after creating a new user", logger.Error(err))
 		return failureCreateUser
 	}
 
+	user.Id = uint64(userId)
 	return nil
 }
 
-func (db *mysql) ReadUserById(id int64) (*models.User, failures.Failure) {
-	stmt, err := db.connection.Prepare(queryReadUserById)
+func (db *mysql) FindUserById(id int64) (*models.User, failures.Failure) {
+	stmt, err := db.connection.Prepare(queryFindUserById)
 	if err != nil {
 		db.logger.Error("error when trying to prepare read user statement", logger.Error(err))
-		return nil, failureReadUserById
+		return nil, failureFindUserById
 	}
 	defer stmt.Close()
 
@@ -65,18 +67,18 @@ func (db *mysql) ReadUserById(id int64) (*models.User, failures.Failure) {
 	err = result.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, failureReadUserByIdNotFound
+			return nil, failureFindUserByIdNotFound
 		}
 
 		db.logger.Error("error when trying to read user by id", logger.Error(err))
-		return nil, failureReadUserById
+		return nil, failureFindUserById
 	}
 
 	return user, nil
 }
 
-func (db *mysql) ReadUserByEmailAndPassword(e string, p string) (*models.User, failures.Failure) {
-	stmt, err := db.connection.Prepare(queryReadUserByEmailAndPassword)
+func (db *mysql) FindUserByEmailAndPassword(e string, p string) (*models.User, failures.Failure) {
+	stmt, err := db.connection.Prepare(queryFindUserByEmailAndPassword)
 	if err != nil {
 		db.logger.Error("error when trying to prepare read user statement", logger.Error(err))
 		return nil, failureReadUserByEmailAndPassword
@@ -92,6 +94,10 @@ func (db *mysql) ReadUserByEmailAndPassword(e string, p string) (*models.User, f
 	}
 
 	return user, nil
+}
+
+func (db *mysql) FindUsersByEmail(email string) ([]models.User, failures.Failure) {
+	return nil, nil
 }
 
 func (db *mysql) UpdateUser(user *models.User) failures.Failure {

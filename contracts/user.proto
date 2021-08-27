@@ -8,7 +8,7 @@ message UserCredentialContract {
 }
 
 message UserResponse {
-    int64 Id = 1;
+    uint64 Id = 1;
 }
 
 service User {

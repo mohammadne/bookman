@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"github.com/mohammadne/bookman/user/internal/database"
+	"github.com/mohammadne/bookman/user/internal/models"
 	"github.com/mohammadne/bookman/user/internal/network/grpc/contracts"
 	"github.com/mohammadne/go-pkgs/logger"
 	grpc "google.golang.org/grpc"
@@ -18,6 +19,7 @@ type grpcServer struct {
 
 	// internal dependencies
 	server *grpc.Server
+	contracts.UnimplementedUserServer
 }
 
 func New(cfg *Config, log logger.Logger, db database.Database) *grpcServer {
@@ -38,14 +40,37 @@ func (s *grpcServer) Serve(<-chan struct{}) {
 	s.server.Serve(listener)
 }
 
-// TODO : FIX HARD CODE
-func (s *grpcServer) CreateUser(context.Context, *contracts.UserCredentialContract,
+func (s *grpcServer) CreateUser(_ context.Context, credentials *contracts.UserCredentialContract,
 ) (*contracts.UserResponse, error) {
-	return &contracts.UserResponse{Id: 1}, nil
+	userId, err := s.getUserId(credentials)
+	if userId != 0 || err == nil {
+		// already exists
+	}
+
+	user := new(models.User)
+	failure := s.database.CreateUser(user)
+	if failure != nil {
+		return nil, failure
+	}
+
+	return &contracts.UserResponse{Id: user.Id}, nil
 }
 
-// TODO : FIX HARD CODE
-func (s *grpcServer) GetUser(context.Context, *contracts.UserCredentialContract,
+func (s *grpcServer) GetUser(_ context.Context, credentials *contracts.UserCredentialContract,
 ) (*contracts.UserResponse, error) {
-	return &contracts.UserResponse{Id: 1}, nil
+	userId, err := s.getUserId(credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	return &contracts.UserResponse{Id: userId}, nil
+}
+
+func (s *grpcServer) getUserId(credentials *contracts.UserCredentialContract) (uint64, error) {
+	user, failure := s.database.FindUserByEmailAndPassword(credentials.Email, credentials.Password)
+	if failure != nil {
+		return 0, failure
+	}
+
+	return uint64(user.Id), nil
 }

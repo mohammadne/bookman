@@ -21,6 +21,7 @@ type grpcServer struct {
 
 	// internal dependencies
 	server *grpc.Server
+	contracts.UnimplementedAuthServer
 }
 
 func NewServer(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) network.Server {

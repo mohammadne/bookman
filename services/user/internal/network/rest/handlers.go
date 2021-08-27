@@ -21,7 +21,7 @@ func (rest *restEcho) getUser(ctx echo.Context) error {
 		return ctx.String(http.StatusBadRequest, "bad request")
 	}
 
-	user, readErr := rest.database.ReadUserById(id)
+	user, readErr := rest.database.FindUserById(id)
 	if readErr != nil {
 		return ctx.JSON(readErr.Status(), readErr)
 	}

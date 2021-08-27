@@ -49,14 +49,15 @@ func (c *userClient) GetUser(ctx context.Context, in *UserCredentialContract, op
 }
 
 // UserServer is the server API for User service.
-// All implementations should embed UnimplementedUserServer
+// All implementations must embed UnimplementedUserServer
 // for forward compatibility
 type UserServer interface {
 	CreateUser(context.Context, *UserCredentialContract) (*UserResponse, error)
 	GetUser(context.Context, *UserCredentialContract) (*UserResponse, error)
+	mustEmbedUnimplementedUserServer()
 }
 
-// UnimplementedUserServer should be embedded to have forward compatible implementations.
+// UnimplementedUserServer must be embedded to have forward compatible implementations.
 type UnimplementedUserServer struct {
 }
 
@@ -66,6 +67,7 @@ func (UnimplementedUserServer) CreateUser(context.Context, *UserCredentialContra
 func (UnimplementedUserServer) GetUser(context.Context, *UserCredentialContract) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
+func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
 // UnsafeUserServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to UserServer will

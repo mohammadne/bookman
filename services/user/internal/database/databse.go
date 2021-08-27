@@ -12,8 +12,9 @@ import (
 
 type Database interface {
 	CreateUser(user *models.User) failures.Failure
-	ReadUserById(id int64) (*models.User, failures.Failure)
-	ReadUserByEmailAndPassword(email string, password string) (*models.User, failures.Failure)
+	FindUserById(id int64) (*models.User, failures.Failure)
+	FindUserByEmailAndPassword(email string, password string) (*models.User, failures.Failure)
+	FindUsersByEmail(email string) ([]models.User, failures.Failure)
 	UpdateUser(user *models.User) failures.Failure
 	DeleteUser(user *models.User) failures.Failure
 }
@@ -46,7 +47,6 @@ func NewMysqlDatabase(cfg *Config, log logger.Logger) Database {
 		return nil
 	}
 
-	// check client connection (ping it)
 	if err = client.Ping(); err != nil {
 		log.Fatal(errPingDatabse, logger.Error(err))
 		return nil
