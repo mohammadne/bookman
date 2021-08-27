@@ -31,12 +31,11 @@ func New(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) network.Serve
 }
 
 func (rest *restServer) setupRoutes() {
-	authGroup := rest.instance.Group("/auth")
-
-	authGroup.POST("/metrics", echo.WrapHandler(promhttp.Handler()))
-	authGroup.POST("/sign_up", rest.signUp)
-	authGroup.POST("/sign_in", rest.signIn)
-	authGroup.POST("/sign_out", rest.signOut)
+	rest.instance.POST("/auth/metrics", echo.WrapHandler(promhttp.Handler()))
+	rest.instance.POST("/auth/sign_up", rest.signUp)
+	rest.instance.POST("/auth/sign_in", rest.signIn)
+	rest.instance.POST("/auth/sign_out", rest.signOut)
+	rest.instance.POST("/auth/refresh_token", rest.refreshToken)
 }
 
 func (rest *restServer) Serve(<-chan struct{}) {

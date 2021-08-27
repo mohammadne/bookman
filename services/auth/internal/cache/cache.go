@@ -12,6 +12,8 @@ type Cache interface {
 	// SetToken sets body into cahce
 	SetJwt(id uint64, body *models.Jwt) failures.Failure
 
-	// GetToken gets id-value and put it into body
-	GetToken(id uint64) (*models.Jwt, failures.Failure)
+	// GetUserId gets user-id
+	GetUserId(*models.AccessDetails) (uint64, failures.Failure)
+
+	RevokeJwt(uuid string) (int64, failures.Failure)
 }

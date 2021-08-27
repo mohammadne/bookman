@@ -41,7 +41,17 @@ func (s *grpcServer) Serve(<-chan struct{}) {
 	s.server.Serve(listener)
 }
 
-func (s *grpcServer) TokenMetadata(context.Context, *contracts.TokenContract,
+func (s *grpcServer) TokenMetadata(ctx context.Context, token *contracts.TokenContract,
 ) (*contracts.TokenMetadataResponse, error) {
-	return nil, nil
+	accessDetails, err := s.jwt.ExtractTokenMetadata(token.Token, jwt.Access)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = s.cache.GetUserId(accessDetails)
+	if err != nil {
+		return nil, err
+	}
+
+	return &contracts.TokenMetadataResponse{IsValid: true}, nil
 }

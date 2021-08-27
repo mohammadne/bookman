@@ -21,6 +21,7 @@ var (
 	failureNotFound   = failures.Database{}.NewNotFound("no matching record found in database")
 	failureSet        = failures.Database{}.NewInternalServer("error setting value into database")
 	failureGet        = failures.Database{}.NewInternalServer("error getting value from database")
+	failureRevoke     = failures.Database{}.NewInternalServer("error revoking value from database")
 )
 
 func NewRedis(cfg *Config, l logger.Logger) Cache {
@@ -89,23 +90,29 @@ func (rc *redisCache) setToken(userId uint64, token *models.Token) failures.Fail
 	return nil
 }
 
-func (rc *redisCache) GetToken(id uint64) (*models.Jwt, failures.Failure) {
-	// value, err := rc.instance.Get(rc.context, id).Result()
-	// if err != nil {
-	// 	if err == redis.Nil {
-	// 		return "", failureNotFound
-	// 	}
+func (rc *redisCache) GetUserId(ad *models.AccessDetails) (uint64, failures.Failure) {
+	userid, err := rc.instance.Get(rc.context, ad.TokenUuid).Result()
+	if err != nil {
+		if err == redis.Nil {
+			return 0, failureNotFound
+		}
 
-	// 	rc.logger.Error("error getting from redis", logger.Error(err))
-	// 	return "", failureGet
-	// }
+		rc.logger.Error("error getting from redis", logger.Error(err))
+		return 0, failureGet
+	}
 
-	// if len(value) == 0 {
-	// 	return "", failureNotFound
-	// }
+	userID, _ := strconv.ParseUint(userid, 10, 64)
+	return userID, nil
+}
 
-	// return value, nil
-	return nil, nil
+func (rc *redisCache) RevokeJwt(uuid string) (int64, failures.Failure) {
+	deleted, err := rc.instance.Del(rc.context, uuid).Result()
+	if err != nil {
+		rc.logger.Error("error revoking from redis", logger.Error(err))
+		return 0, failureRevoke
+	}
+
+	return deleted, nil
 }
 
 // newSingleRedis returns a new `RedisHandler` with a single Redis client.
