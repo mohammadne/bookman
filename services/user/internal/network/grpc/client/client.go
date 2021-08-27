@@ -1,20 +1,20 @@
 package grpc_client
 
 import (
-	"github.com/mohammadne/bookman/auth/internal/network/grpc/contracts"
+	"github.com/mohammadne/bookman/user/internal/network/grpc/contracts"
 	"github.com/mohammadne/go-pkgs/logger"
 	"google.golang.org/grpc"
 )
 
 type Client interface {
-	UserClient
+	AuthClient
 }
 
 type grpcClient struct {
 	config *Config
 	logger logger.Logger
 
-	userClient contracts.UserClient
+	authClient contracts.AuthClient
 }
 
 func New(cfg *Config, log logger.Logger) Client {
@@ -22,14 +22,14 @@ func New(cfg *Config, log logger.Logger) Client {
 }
 
 func (g *grpcClient) Setup() {
-	userConnection, err := grpc.Dial(g.config.UserAddress, grpc.WithInsecure())
+	authConnection, err := grpc.Dial(g.config.AuthAddress, grpc.WithInsecure())
 	if err != nil {
 		g.logger.Fatal(
-			"error getting user grpc connection",
-			logger.String("address", g.config.UserAddress),
+			"error getting auth grpc connection",
+			logger.String("address", g.config.AuthAddress),
 			logger.Error(err),
 		)
 	}
 
-	g.userClient = contracts.NewUserClient(userConnection)
+	g.authClient = contracts.NewAuthClient(authConnection)
 }
