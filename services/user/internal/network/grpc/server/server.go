@@ -48,7 +48,7 @@ func (s *grpcServer) CreateUser(_ context.Context, credentials *contracts.UserCr
 		return nil, failures.Rest{}.NewBadRequest("email is already registered")
 	}
 
-	user = &models.User{}
+	user = &models.User{Email: credentials.Email, Password: credentials.Password}
 	failure = s.database.CreateUser(user)
 	if failure != nil {
 		return nil, failure

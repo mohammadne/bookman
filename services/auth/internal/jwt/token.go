@@ -3,7 +3,6 @@ package jwt
 import (
 	"errors"
 	"fmt"
-	"os"
 	"strconv"
 	"time"
 
@@ -63,7 +62,7 @@ func (jwt *jwt) CreateJwt(userId uint64) (*models.Jwt, error) {
 	return tokenDetail, nil
 }
 
-func createToken(userId uint64, secretKey string, token *models.Token) error {
+func createToken(userId uint64, secret string, token *models.Token) error {
 	claims := jwtPkg.MapClaims{
 		"authorized": true,
 		"token_uuid": token.UUID,
@@ -73,7 +72,7 @@ func createToken(userId uint64, secretKey string, token *models.Token) error {
 
 	var err error
 	at := jwtPkg.NewWithClaims(jwtPkg.SigningMethodHS256, claims)
-	token.Token, err = at.SignedString([]byte(os.Getenv(secretKey)))
+	token.Token, err = at.SignedString([]byte(secret))
 	if err != nil {
 		return err
 	}

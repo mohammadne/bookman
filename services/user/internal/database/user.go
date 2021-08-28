@@ -2,8 +2,10 @@ package database
 
 import (
 	"database/sql"
+	"strings"
 
 	"github.com/mohammadne/bookman/user/internal/models"
+	"github.com/mohammadne/bookman/user/pkg/utils"
 	"github.com/mohammadne/go-pkgs/failures"
 	"github.com/mohammadne/go-pkgs/logger"
 )
@@ -18,12 +20,15 @@ const (
 )
 
 var (
-	failureCreateUser = failures.Database{}.NewInternalServer("error when tying to create user")
+	failureCreateUser    = failures.Database{}.NewInternalServer("error when tying to create user")
+	failureDuplicateUser = failures.Database{}.NewBadRequest("entry exists")
 
 	failureFindUserById         = failures.Database{}.NewInternalServer("error when tying to read user")
 	failureFindUserByIdNotFound = failures.Database{}.NewInternalServer("there is no user with requested ID")
 
 	failureReadUserByEmailAndPassword = failures.Database{}.NewInternalServer("error when tying to read user")
+
+	failureReadUserByEmail = failures.Database{}.NewInternalServer("error when tying to read user")
 
 	failureUpdateUser = failures.Database{}.NewInternalServer("error when tying to update user")
 
@@ -38,8 +43,13 @@ func (db *mysql) CreateUser(user *models.User) failures.Failure {
 	}
 	defer stmt.Close()
 
+	user.DateCreated = utils.NowDatabseFormatString()
 	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.DateCreated, user.Password)
 	if err != nil {
+		if strings.Contains(err.Error(), "Duplicate entry") {
+			return failureDuplicateUser
+		}
+
 		db.logger.Error("error when trying to create user", logger.Error(err))
 		return failureCreateUser
 	}
@@ -100,7 +110,7 @@ func (db *mysql) FindUserByEmail(email string) (*models.User, failures.Failure) 
 	stmt, err := db.connection.Prepare(queryFindUserByEmail)
 	if err != nil {
 		db.logger.Error("error when trying to prepare read user statement", logger.Error(err))
-		return nil, failureReadUserByEmailAndPassword
+		return nil, failureReadUserByEmail
 	}
 	defer stmt.Close()
 
@@ -109,7 +119,7 @@ func (db *mysql) FindUserByEmail(email string) (*models.User, failures.Failure) 
 	err = result.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated)
 	if err != nil {
 		db.logger.Error("error when trying to read user by email", logger.Error(err))
-		return nil, failureReadUserByEmailAndPassword
+		return nil, failureReadUserByEmail
 	}
 
 	return user, nil

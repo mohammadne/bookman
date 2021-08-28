@@ -12,6 +12,7 @@ import (
 
 var (
 	failureInvalidBody         = failures.Rest{}.NewBadRequest("invalid json body provided")
+	failureBadRequest          = failures.Rest{}.NewBadRequest("email is already registered")
 	failureNotFound            = failures.Rest{}.NewNotFound("invalid email and password credentials given")
 	failureUnautorized         = failures.Rest{}.NewUnauthorized("unauthorized")
 	failureUnprocessableEntity = failures.Rest{}.NewUnprocessableEntity("unprocessable entity")
@@ -25,7 +26,7 @@ func (r restServer) signUp(ctx echo.Context) error {
 
 	userId, err := r.userGrpc.CreateUser(userCredential)
 	if err != nil || userId == 0 {
-		return ctx.JSON(failureNotFound.Status(), failureNotFound)
+		return ctx.JSON(failureBadRequest.Status(), failureBadRequest)
 	}
 
 	tokens, failure := r.generateTokens(userId)
@@ -59,12 +60,12 @@ func (r restServer) signOut(ctx echo.Context) error {
 	tokenString := extractToken(ctx.Request())
 	accessDetails, err := r.jwt.ExtractTokenMetadata(tokenString, jwt.Access)
 	if err != nil {
-		return ctx.JSON(http.StatusUnauthorized, "unauthorized")
+		return ctx.JSON(failureUnautorized.Status(), failureUnautorized)
 	}
 
 	deleted, delErr := r.cache.RevokeJwt(accessDetails.TokenUuid)
 	if delErr != nil || deleted == 0 {
-		return ctx.JSON(http.StatusUnauthorized, "unauthorized")
+		return ctx.JSON(failureUnautorized.Status(), failureUnautorized)
 	}
 
 	return ctx.JSON(http.StatusOK, "Successfully logged out")
