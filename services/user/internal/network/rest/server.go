@@ -31,8 +31,8 @@ func (rest *restEcho) setupRoutes() {
 	authGroup := rest.instance.Group("/users")
 
 	authGroup.POST("/metrics", echo.WrapHandler(promhttp.Handler()))
-	authGroup.POST("/:id", rest.getUser)
-	authGroup.POST("/me", rest.getMe)
+	authGroup.GET("/:id", rest.getUser)
+	authGroup.GET("/me", rest.getMe)
 }
 
 func (rest *restEcho) Serve(<-chan struct{}) {

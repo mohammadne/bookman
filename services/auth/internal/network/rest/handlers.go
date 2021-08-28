@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -72,17 +73,16 @@ func (r restServer) signOut(ctx echo.Context) error {
 }
 
 func (r restServer) refreshToken(ctx echo.Context) error {
-	mapToken := map[string]string{}
-	if err := ctx.Bind(mapToken); err != nil {
+	body := struct {
+		RefreshToken string `json:"refresh_token"`
+	}{}
+
+	if err := ctx.Bind(&body); err != nil {
+		fmt.Println(err)
 		return ctx.JSON(failureInvalidBody.Status(), failureInvalidBody)
 	}
 
-	refreshToken, ok := mapToken["refresh_token"]
-	if !ok {
-		return ctx.JSON(failureInvalidBody.Status(), failureInvalidBody)
-	}
-
-	accessDetails, err := r.jwt.ExtractTokenMetadata(refreshToken, jwt.Refresh)
+	accessDetails, err := r.jwt.ExtractTokenMetadata(body.RefreshToken, jwt.Refresh)
 	if err != nil {
 		return ctx.JSON(failureUnprocessableEntity.Status(), failureUnprocessableEntity)
 	}

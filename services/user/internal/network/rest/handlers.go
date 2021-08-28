@@ -26,7 +26,7 @@ func (rest *restEcho) getUser(ctx echo.Context) error {
 		return ctx.JSON(readErr.Status(), readErr)
 	}
 
-	return ctx.JSON(http.StatusOK, user)
+	return ctx.JSON(http.StatusOK, user.Marshall(false))
 }
 
 func (rest *restEcho) getMe(ctx echo.Context) error {
