@@ -29,6 +29,10 @@ func (rest *restEcho) getUser(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, user.Marshall(false))
 }
 
-func (rest *restEcho) getMe(ctx echo.Context) error {
+func (rest *restEcho) getMyUser(ctx echo.Context) error {
+	return nil
+}
+
+func (rest *restEcho) searchUsers(ctx echo.Context) error {
 	return nil
 }
