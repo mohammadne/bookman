@@ -9,7 +9,7 @@ import (
 	"github.com/mohammadne/bookman/auth/internal/network"
 	"github.com/mohammadne/bookman/auth/internal/network/grpc/contracts"
 	"github.com/mohammadne/go-pkgs/logger"
-	grpc "google.golang.org/grpc"
+	"google.golang.org/grpc"
 )
 
 type grpcServer struct {
