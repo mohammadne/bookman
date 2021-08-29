@@ -6,7 +6,8 @@ import (
 	"github.com/mohammadne/bookman/user/config"
 	"github.com/mohammadne/bookman/user/internal/database"
 	"github.com/mohammadne/bookman/user/internal/network"
-	grpc_server "github.com/mohammadne/bookman/user/internal/network/grpc/server"
+	"github.com/mohammadne/bookman/user/internal/network/grpc"
+	grpc_client "github.com/mohammadne/bookman/user/internal/network/grpc/clients"
 	"github.com/mohammadne/bookman/user/internal/network/rest"
 	"github.com/mohammadne/bookman/user/pkg/logger"
 	"github.com/spf13/cobra"
@@ -52,10 +53,13 @@ func main(environment config.Environment) {
 
 	db := database.NewMysqlDatabase(cfg.Database, log)
 
+	authGrpc := grpc_client.NewUser(cfg.GrpcAuth, log)
+	authGrpc.Setup()
+
 	// serving application servers
 	servers := []network.Server{
-		rest.New(cfg.Rest, log, db),
-		grpc_server.New(cfg.Grpc, log, db),
+		rest.New(cfg.Rest, log, db, authGrpc),
+		grpc.NewServer(cfg.GrpcServer, log, db),
 	}
 
 	for _, server := range servers {

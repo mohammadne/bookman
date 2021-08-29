@@ -1,7 +1,5 @@
 package models
 
-import "encoding/json"
-
 type User struct {
 	Id          uint64 `json:"id"`
 	FirstName   string `json:"first_name"`
@@ -11,13 +9,12 @@ type User struct {
 	DateCreated string `json:"date_created,omitempty"`
 }
 
-func (user *User) Marshall(isPublic bool) interface{} {
+func (user *User) Marshall(isPublic bool) *User {
 	user.Password = ""
 	if isPublic {
 		user.Email = ""
 		user.DateCreated = ""
 	}
 
-	userJson, _ := json.Marshal(user)
-	return userJson
+	return user
 }

@@ -49,10 +49,10 @@ func (s *grpcServer) TokenMetadata(ctx context.Context, token *contracts.TokenCo
 		return nil, err
 	}
 
-	_, err = s.cache.GetUserId(accessDetails)
+	userId, err := s.cache.GetUserId(accessDetails)
 	if err != nil {
 		return nil, err
 	}
 
-	return &contracts.TokenMetadataResponse{IsValid: true}, nil
+	return &contracts.TokenMetadataResponse{IsValid: true, Id: userId}, nil
 }
