@@ -11,38 +11,55 @@ type VectorType uint8
 const (
 	CounterVector VectorType = iota
 	HistogramVector
+
+	//
+
+	// statusVector
+	// timeVector
 )
 
 type Vector interface {
-	// Finish will finish vector
-	Finish()
+	// Collect will finish vector
+	Collect()
 
 	getLabels() []string
 }
 
-// ===========================================================> counterVector
+// ===========================================================> statusVector
 
-type counterVector struct {
+type Status string
+
+const (
+	Success Status = "success"
+	Failure Status = "failure"
+)
+
+type statusVector struct {
 	vector *prometheus.CounterVec
 
 	// labels
 	module   string
 	function string
+	status   Status
 }
 
-func (v *counterVector) Finish() {
+func (v *statusVector) Collect() {
 	v.vector.
 		WithLabelValues(v.module, v.function).
 		Inc()
 }
 
-func (v counterVector) getLabels() []string {
+func (v *statusVector) SetStatus(status Status) {
+	v.status = status
+}
+
+func (v statusVector) getLabels() []string {
 	return []string{"module", "function"}
 }
 
-// ===========================================================> histogramVector
+// ===========================================================> timeVector
 
-type histogramVector struct {
+type timeVector struct {
 	vector *prometheus.HistogramVec
 	start  time.Time
 
@@ -51,12 +68,12 @@ type histogramVector struct {
 	function string
 }
 
-func (v *histogramVector) Finish() {
+func (v *timeVector) Collect() {
 	v.vector.
 		WithLabelValues(v.module, v.function).
 		Observe(time.Since(v.start).Seconds())
 }
 
-func (v histogramVector) getLabels() []string {
+func (v timeVector) getLabels() []string {
 	return []string{"module", "function"}
 }

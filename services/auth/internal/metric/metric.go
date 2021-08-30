@@ -9,8 +9,8 @@ import (
 )
 
 type Metric interface {
-	StartCounterVector(string, string) *counterVector
-	StartHistogramVector(string, string) *histogramVector
+	StartCounterVector(string, string) *statusVector
+	StartHistogramVector(string, string) *timeVector
 }
 
 type prometheusMetric struct {
@@ -36,7 +36,7 @@ func NewPrometheus(cfg *Config, logger *logger.Logger) Metric {
 			Subsystem: internal.Subsystem,
 			Name:      "counterVec",
 		},
-		counterVector{}.getLabels(),
+		statusVector{}.getLabels(),
 	)
 
 	singleton.histogramVec = prometheus.NewHistogramVec(
@@ -45,22 +45,25 @@ func NewPrometheus(cfg *Config, logger *logger.Logger) Metric {
 			Subsystem: internal.Subsystem,
 			Name:      "histogramVec",
 		},
-		histogramVector{}.getLabels(),
+		timeVector{}.getLabels(),
 	)
+
+	prometheus.MustRegister(singleton.counterVec)
+	prometheus.MustRegister(singleton.histogramVec)
 
 	return singleton
 }
 
-func (prom *prometheusMetric) StartCounterVector(module string, function string) *counterVector {
-	return &counterVector{
+func (prom *prometheusMetric) StartCounterVector(module string, function string) *statusVector {
+	return &statusVector{
 		vector:   prom.counterVec,
 		module:   module,
 		function: function,
 	}
 }
 
-func (prom *prometheusMetric) StartHistogramVector(module string, function string) *histogramVector {
-	return &histogramVector{
+func (prom *prometheusMetric) StartHistogramVector(module string, function string) *timeVector {
+	return &timeVector{
 		vector:   prom.histogramVec,
 		start:    time.Now(),
 		module:   module,
