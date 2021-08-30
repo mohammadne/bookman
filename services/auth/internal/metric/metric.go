@@ -9,7 +9,8 @@ import (
 )
 
 type Metric interface {
-	StartCounterVector(string) *counterVector
+	StartCounterVector(string, string) *counterVector
+	StartHistogramVector(string, string) *histogramVector
 }
 
 type prometheusMetric struct {
