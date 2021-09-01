@@ -3,7 +3,7 @@ package books
 import (
 	"context"
 
-	"github.com/mohammadne/go-pkgs/failures"
+	"github.com/mohammadne/bookman/library/pkg/failures"
 )
 
 type Usecase interface {

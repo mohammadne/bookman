@@ -8,8 +8,8 @@ import (
 	"github.com/mohammadne/bookman/library/internal/books"
 	books_rest "github.com/mohammadne/bookman/library/internal/books/delivery/rest"
 	"github.com/mohammadne/bookman/library/pkg/database"
+	"github.com/mohammadne/bookman/library/pkg/logger"
 	"github.com/mohammadne/bookman/library/pkg/rest"
-	"github.com/mohammadne/go-pkgs/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -41,13 +41,16 @@ func (server *Server) main() {
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
 	// repositories
-	booksRepository := books.NewRepository(server.Database)
+	booksRepository := books.NewRepository(server.Database, server.Logger)
 
 	// usecases
 	booksUsecase := books.NewUsecase(booksRepository)
 
-	server.Logger.Info("start serving rest server")
-	server.Rest.Serve(nil)
+	go func() {
+		server.Rest.Serve(nil)
+		server.Logger.Info("start serving rest server")
+	}()
+
 	v1Group := server.Rest.Instance().Group("/api/v1")
 
 	booksHandler := books_rest.NewHandler(booksUsecase)

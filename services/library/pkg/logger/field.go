@@ -1,38 +1,43 @@
 package logger
 
-import (
-	"github.com/mohammadne/go-pkgs/logger"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+type FieldType uint8
+
+const (
+	UnknownType FieldType = iota
+	BoolType
+	IntType
+	Float64Type
+	StringType
+	ErrorType
 )
 
-// convertFields converts Field To ZapField
-func convertFields(fields ...logger.Field) []zapcore.Field {
-	zapFileds := make([]zapcore.Field, 0, len(fields))
-
-	for index := 0; index < len(fields); index++ {
-		zapField := convertField(fields[index])
-		zapFileds = append(zapFileds, zapField)
-	}
-
-	return zapFileds
+type Field struct {
+	Key   string
+	Value interface{}
+	Type  FieldType
 }
 
-func convertField(field logger.Field) zapcore.Field {
-	switch field.Type {
-	case logger.UnknownType:
-		return zap.Any(field.Key, field.Value)
-	case logger.BoolType:
-		return zap.Bool(field.Key, field.Value.(bool))
-	case logger.IntType:
-		return zap.Int(field.Key, field.Value.(int))
-	case logger.Float64Type:
-		return zap.Float64(field.Key, field.Value.(float64))
-	case logger.StringType:
-		return zap.String(field.Key, field.Value.(string))
-	case logger.ErrorType:
-		return zap.Error(field.Value.(error))
-	}
+// Unknown constructs a field with the given key and value.
+func Unknown(key string, val interface{}) Field {
+	return Field{Key: key, Value: val, Type: UnknownType}
+}
 
-	return zapcore.Field{}
+// Int constructs a field with the given key and value.
+func Int(key string, val int) Field {
+	return Field{Key: key, Value: val, Type: IntType}
+}
+
+// Float constructs a field with the given key and value.
+func Float64(key string, val float64) Field {
+	return Field{Key: key, Value: val, Type: Float64Type}
+}
+
+// String constructs a field with the given key and value.
+func String(key string, val string) Field {
+	return Field{Key: key, Value: val, Type: StringType}
+}
+
+// Error constructs a field with the given key and value.
+func Error(val error) Field {
+	return Field{Key: "error", Value: val, Type: ErrorType}
 }

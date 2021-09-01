@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/mohammadne/go-pkgs/failures"
-	"github.com/mohammadne/go-pkgs/logger"
+	"github.com/mohammadne/bookman/library/pkg/failures"
+	"github.com/mohammadne/bookman/library/pkg/logger"
 )
 
 type mysql struct {
@@ -26,8 +26,8 @@ const (
 	errPingDatabse = "error to ping mysql databse"
 )
 
-var (
-	failurePrepareStatement = failures.Database{}.NewInternalServer("error when tying to prepare statement")
+const (
+	errPrepareStatement = "error when tying to prepare statement"
 )
 
 func NewMysqlDatabase(cfg *Config) Database {
@@ -58,7 +58,7 @@ var (
 func (db *mysql) Create(query string, args []interface{}) (int64, failures.Failure) {
 	stmt, err := db.connection.Prepare(query)
 	if err != nil {
-		return 0, failurePrepareStatement
+		return 0, failures.Database{}.NewInternalServer(errPrepareStatement, err)
 	}
 	defer stmt.Close()
 
@@ -87,7 +87,7 @@ var (
 func (db *mysql) Read(query string, args []interface{}, dest ...interface{}) failures.Failure {
 	stmt, err := db.connection.Prepare(query)
 	if err != nil {
-		return failurePrepareStatement
+		return failures.Database{}.NewInternalServer(errPrepareStatement, err)
 	}
 	defer stmt.Close()
 
@@ -111,7 +111,7 @@ var (
 func (db *mysql) Update(query string, args []interface{}) failures.Failure {
 	stmt, err := db.connection.Prepare(query)
 	if err != nil {
-		return failurePrepareStatement
+		return failures.Database{}.NewInternalServer(errPrepareStatement, err)
 	}
 	defer stmt.Close()
 
@@ -129,7 +129,7 @@ var (
 func (db *mysql) Delete(query string, args []interface{}) failures.Failure {
 	stmt, err := db.connection.Prepare(query)
 	if err != nil {
-		return failurePrepareStatement
+		return failures.Database{}.NewInternalServer(errPrepareStatement, err)
 	}
 	defer stmt.Close()
 

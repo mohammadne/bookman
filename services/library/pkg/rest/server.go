@@ -15,7 +15,9 @@ type server struct {
 }
 
 func New(cfg *Config) Server {
-	return &server{instance: echo.New(), config: cfg}
+	server := &server{instance: echo.New(), config: cfg}
+	server.instance.HideBanner = true
+	return server
 }
 
 func (s *server) Serve(<-chan struct{}) {

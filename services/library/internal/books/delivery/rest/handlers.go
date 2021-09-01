@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/mohammadne/bookman/library/internal/books"
-	"github.com/mohammadne/go-pkgs/failures"
+	"github.com/mohammadne/bookman/library/pkg/failures"
 )
 
 type Handler interface {
@@ -24,19 +24,19 @@ func NewHandler(usecase books.Usecase) Handler {
 }
 
 func (h *handler) Route(group *echo.Group) {
-	group.GET("books/:id", h.get)
+	group.GET("/:id", h.get)
 }
 
 func (h *handler) get(ctx echo.Context) error {
 	idStr := ctx.Param("id")
 	if idStr == "" {
-		failure := failures.Rest{}.NewBadRequest("invalid id is given")
+		failure := failures.Http{}.NewBadRequest("invalid id is given")
 		return ctx.JSON(failure.Status(), failure)
 	}
 
 	id, parseErr := strconv.ParseUint(idStr, 10, 64)
 	if parseErr != nil {
-		failure := failures.Rest{}.NewBadRequest("given id is malformed")
+		failure := failures.Http{}.NewBadRequest("given id is malformed")
 		return ctx.JSON(failure.Status(), failure)
 	}
 
