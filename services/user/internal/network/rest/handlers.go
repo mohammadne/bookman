@@ -36,7 +36,7 @@ func (rest *restEcho) searchUsers(ctx echo.Context) error {
 
 func (rest *restEcho) getUserByIdString(idStr string) (*models.User, failures.Failure) {
 	if idStr == "" {
-		return nil, failures.Rest{}.NewBadRequest("invalid user id is given")
+		return nil, failures.Rest{}.NewBadRequest("invalid id is given")
 	}
 
 	id, parseErr := strconv.ParseInt(idStr, 10, 64)

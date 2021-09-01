@@ -6,6 +6,7 @@ import (
 	"log"
 	"strings"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/mohammadne/go-pkgs/failures"
 	"github.com/mohammadne/go-pkgs/logger"
 )

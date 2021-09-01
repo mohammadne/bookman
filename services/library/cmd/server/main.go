@@ -5,10 +5,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/labstack/echo/v4"
 	"github.com/mohammadne/bookman/library/internal/books"
-	"github.com/mohammadne/bookman/library/internal/books/delivery/rest"
+	books_rest "github.com/mohammadne/bookman/library/internal/books/delivery/rest"
 	"github.com/mohammadne/bookman/library/pkg/database"
+	"github.com/mohammadne/bookman/library/pkg/rest"
 	"github.com/mohammadne/go-pkgs/logger"
 	"github.com/spf13/cobra"
 )
@@ -18,46 +18,41 @@ const (
 	short = "run server"
 )
 
-func Command(logger logger.Logger, db database.Database) *cobra.Command {
+type Server struct {
+	Logger   logger.Logger
+	Database database.Database
+	Rest     rest.Server
+}
+
+func (server Server) Command() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   use,
 		Short: short,
 		Run: func(cmd *cobra.Command, args []string) {
-			main(logger, db)
+			server.main()
 		},
 	}
 
 	return cmd
 }
 
-func main(logger logger.Logger, db database.Database) {
+func (server *Server) main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
 	// repositories
-	booksRepository := books.NewRepository(db)
+	booksRepository := books.NewRepository(server.Database)
 
 	// usecases
 	booksUsecase := books.NewUsecase(booksRepository)
 
-	e := echo.New()
-	v1Group := e.Group("/api/v1")
+	server.Logger.Info("start serving rest server")
+	server.Rest.Serve(nil)
+	v1Group := server.Rest.Instance().Group("/api/v1")
 
-	// healthGroup := v1Group.Group("/health")
-
-	booksGroup := v1Group.Group("/books")
-	booksHandler := rest.NewHandler(booksUsecase)
-	rest.Route(booksGroup, booksHandler)
-
-	// servers := []network.Server{
-	// 	rest.New(cfg.Rest, log, db, authGrpc),
-	// 	grpc.NewServer(cfg.GrpcServer, log, db),
-	// }
-
-	// for _, server := range servers {
-	// 	go server.Serve(done)
-	// }
+	booksHandler := books_rest.NewHandler(booksUsecase)
+	booksHandler.Route(v1Group.Group("/books"))
 
 	<-quit
-	logger.Info("Server Exited Properly")
+	server.Logger.Info("Server Exited Properly")
 }
