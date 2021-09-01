@@ -1,4 +1,6 @@
-package http
+package rest
+
+import "github.com/labstack/echo/v4"
 
 // import "github.com/mohammadne/bookman/library/internal/books/usecase"
 
@@ -17,3 +19,19 @@ package http
 // 	rest.instance.POST("/auth/sign_out", rest.signOut)
 // 	rest.instance.POST("/auth/refresh_token", rest.refreshToken)
 // }
+
+func Route(g *echo.Group, h Handler) {
+	g.POST("", h.getBook)
+}
+
+// type router struct {
+// 	group *echo.Group
+// }
+
+// func New(group *echo.Group) *router {
+// 	s := &router{group: group}
+// 	s.setupRoutes()
+// 	return s
+// }
+
+// func (router *router) setupRoutes() {}

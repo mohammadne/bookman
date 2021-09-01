@@ -1,4 +1,4 @@
-package book
+package books
 
 import (
 	"context"
@@ -14,8 +14,8 @@ type usecaseImpl struct {
 	repository Repository
 }
 
-func NewUsecase() Usecase {
-	return &usecaseImpl{}
+func NewUsecase(repository Repository) Usecase {
+	return &usecaseImpl{repository: repository}
 }
 
 func (usecase *usecaseImpl) GetById(ctx context.Context, id uint64) (*Book, failures.Failure) {
