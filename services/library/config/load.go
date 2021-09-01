@@ -5,7 +5,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/mohammadne/bookman/library/pkg/database"
 	"github.com/mohammadne/bookman/library/pkg/logger"
-	"github.com/mohammadne/bookman/library/pkg/rest"
+	"github.com/mohammadne/bookman/library/pkg/web/rest"
 )
 
 const (

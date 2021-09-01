@@ -3,9 +3,7 @@ package main
 import (
 	"github.com/mohammadne/bookman/library/cmd/server"
 	"github.com/mohammadne/bookman/library/config"
-	"github.com/mohammadne/bookman/library/pkg/database"
 	"github.com/mohammadne/bookman/library/pkg/logger"
-	"github.com/mohammadne/bookman/library/pkg/rest"
 	"github.com/spf13/cobra"
 )
 
@@ -19,15 +17,12 @@ const (
 
 func main() {
 	cfg := config.Load(config.Development)
-	logger := logger.NewZap(cfg.Logger)
-	database := database.NewMysqlDatabase(cfg.Database)
-	rest := rest.New(cfg.Rest)
+	lg := logger.NewZap(cfg.Logger)
 
 	// root subcommands
 	serverCmd := server.Server{
-		Logger:   logger,
-		Database: database,
-		Rest:     rest,
+		Config: cfg,
+		Logger: lg,
 	}.Command()
 
 	// create root command and add sub-commands to it
@@ -36,6 +31,6 @@ func main() {
 
 	// run cobra root cmd
 	if err := cmd.Execute(); err != nil {
-		panic(map[string]interface{}{"err": err, "msg": errExecuteCMD})
+		lg.Panic(errExecuteCMD, logger.Error(err))
 	}
 }

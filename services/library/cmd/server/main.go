@@ -5,11 +5,13 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/mohammadne/bookman/library/config"
 	"github.com/mohammadne/bookman/library/internal/books"
 	books_rest "github.com/mohammadne/bookman/library/internal/books/delivery/rest"
 	"github.com/mohammadne/bookman/library/pkg/database"
 	"github.com/mohammadne/bookman/library/pkg/logger"
-	"github.com/mohammadne/bookman/library/pkg/rest"
+	"github.com/mohammadne/bookman/library/pkg/web"
+	"github.com/mohammadne/bookman/library/pkg/web/rest"
 	"github.com/spf13/cobra"
 )
 
@@ -19,9 +21,8 @@ const (
 )
 
 type Server struct {
-	Logger   logger.Logger
-	Database database.Database
-	Rest     rest.Server
+	Config *config.Config
+	Logger logger.Logger
 }
 
 func (server Server) Command() *cobra.Command {
@@ -40,21 +41,26 @@ func (server *Server) main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
+	db := database.NewMysqlDatabase(server.Config.Database)
+
 	// repositories
-	booksRepository := books.NewRepository(server.Database, server.Logger)
+	booksRepository := books.NewRepository(db, server.Logger)
 
 	// usecases
 	booksUsecase := books.NewUsecase(booksRepository)
 
-	go func() {
-		server.Rest.Serve(nil)
-		server.Logger.Info("start serving rest server")
-	}()
-
-	v1Group := server.Rest.Instance().Group("/api/v1")
+	rest := rest.New(server.Config.Rest)
+	v1Group := rest.Instance().Group("/api/v1")
 
 	booksHandler := books_rest.NewHandler(booksUsecase)
 	booksHandler.Route(v1Group.Group("/books"))
+
+	go func(s web.Server) {
+		server.Logger.Info("start serving rest server")
+		if err := s.Serve(nil); err != nil {
+			server.Logger.Panic("server failed to start", logger.Error(err))
+		}
+	}(rest)
 
 	<-quit
 	server.Logger.Info("Server Exited Properly")
