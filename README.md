@@ -1,5 +1,7 @@
-<!-- TITLE -->
-<h1 align="center">BOOK MAN</h1>
+<!-- LOGO -->
+<p align="center">
+  <img src="assets/logo.png" />
+</p>
 
 <!-- BADGES -->
 <p align="center">
@@ -10,26 +12,25 @@
   <img src="https://img.shields.io/github/downloads/mohammadne/bookman/total.svg?style=for-the-badge">
 </p>
 
-<p align="center">
-  <img src="assets/logo.png" />
-</p>
-
-# Introduction
-> `Bookman` is an online REST renting book platform.
+<!-- TITLE -->
+# BOOK MAN
+> `Bookman` is an online REST renting book platform whic you can authenticate,
+> order, reserve a book in your account.
 >
-> it's microservices and uses clean-architecture
+> it's a microservices project with highly focus on code architecture.
 
 ## Microservices:
 
-1. `User Service` is user managment service
+1. [`User`](https://img.shields.io) is a service for user managment
 
-2. `Auth Service` is authentication service
+2. [`Auth`](https://img.shields.io) is bookman authentication service
 
-3. `Library Service` will list all availables books
+3. [`Library`](https://img.shields.io) is bookman core service, responsible
+for serving books and authors
 
-4. `Rent Service` is responsible for rent a book to a user (SOON)
+<!-- 4. [`Rent`](https://img.shields.io) -->
 
-5. `Notification Service` contains email and other means notification (SOON)
+<!-- 5. [`Notification`](https://img.shields.io) -->
 
 ## GUIDE
 
