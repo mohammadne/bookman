@@ -14,7 +14,7 @@
 
 <!-- TITLE -->
 # BOOK MAN
-> `Bookman` is an online REST renting book platform whic you can authenticate,
+> an online REST renting book platform which you can authenticate,
 > order, reserve a book in your account.
 >
 > it's a microservices project with highly focus on code architecture.
