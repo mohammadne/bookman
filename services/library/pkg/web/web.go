@@ -4,4 +4,6 @@ type Server interface {
 	Serve(<-chan struct{}) error
 }
 
-type Client interface{}
+type Client interface {
+	Dial()
+}

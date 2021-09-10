@@ -30,13 +30,13 @@ func (h *handler) Route(group *echo.Group) {
 func (h *handler) get(ctx echo.Context) error {
 	idStr := ctx.Param("id")
 	if idStr == "" {
-		failure := failures.Http{}.NewBadRequest("invalid id is given")
+		failure := failures.Web{}.NewBadRequest("invalid id is given")
 		return ctx.JSON(failure.Status(), failure)
 	}
 
 	id, parseErr := strconv.ParseUint(idStr, 10, 64)
 	if parseErr != nil {
-		failure := failures.Http{}.NewBadRequest("given id is malformed")
+		failure := failures.Web{}.NewBadRequest("given id is malformed")
 		return ctx.JSON(failure.Status(), failure)
 	}
 
