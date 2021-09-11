@@ -16,28 +16,26 @@ type AuthClient interface {
 }
 
 type authClient struct {
-	config *Config
 	logger logger.Logger
 	tracer trace.Tracer
-	client pb.AuthClient
+	api    pb.AuthClient
 }
 
-func NewAuthClient(config *Config, logger logger.Logger, tracer trace.Tracer) *authClient {
-	return &authClient{config: config, logger: logger, tracer: tracer}
-}
+func NewAuthClient(cfg *Config, lg logger.Logger, tracer trace.Tracer) *authClient {
+	client := &authClient{logger: lg, tracer: tracer}
 
-func (client *authClient) Setup() {
-	Address := fmt.Sprintf("%s:%s", client.config.Host, client.config.Port)
+	Address := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
 	authConnection, err := grpcPkg.Dial(Address, grpcPkg.WithInsecure())
 	if err != nil {
-		client.logger.Fatal(
+		lg.Fatal(
 			"error getting auth grpc connection",
 			logger.String("address", Address),
 			logger.Error(err),
 		)
 	}
+	client.api = pb.NewAuthClient(authConnection)
 
-	client.client = pb.NewAuthClient(authConnection)
+	return client
 }
 
 var (
@@ -50,7 +48,7 @@ func (client *authClient) GetTokenMetadata(ctx context.Context, token string) (u
 	defer span.End()
 
 	contract := &pb.TokenContract{Token: token}
-	response, err := client.client.TokenMetadata(ctx, contract)
+	response, err := client.api.TokenMetadata(ctx, contract)
 	if err != nil {
 		client.logger.Error("grpc get token metadata", logger.Error(err))
 		span.RecordError(err)
