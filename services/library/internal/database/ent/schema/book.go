@@ -1,6 +1,9 @@
 package schema
 
-import "entgo.io/ent"
+import (
+	"entgo.io/ent"
+	"entgo.io/ent/schema/field"
+)
 
 // Book holds the schema definition for the Book entity.
 type Book struct {
@@ -9,7 +12,9 @@ type Book struct {
 
 // Fields of the Book.
 func (Book) Fields() []ent.Field {
-	return nil
+	return []ent.Field{
+		field.String("title"),
+	}
 
 	// return []ent.Field{
 	// 	field.Uint64("caller_id").
