@@ -53,7 +53,7 @@ func main(environment config.Environment) {
 
 	db := database.NewMysqlDatabase(cfg.Database, log)
 
-	authGrpc := grpc_client.NewUser(cfg.GrpcAuth, log)
+	authGrpc := grpc_client.NewAuth(cfg.GrpcAuth, log)
 	authGrpc.Setup()
 
 	// serving application servers

@@ -22,7 +22,7 @@ type authClient struct {
 	client contracts.AuthClient
 }
 
-func NewUser(cfg *grpc.Config, log logger.Logger) *authClient {
+func NewAuth(cfg *grpc.Config, log logger.Logger) *authClient {
 	return &authClient{config: cfg, logger: log}
 }
 
