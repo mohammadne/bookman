@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-type webFailure struct {
+type networkFailure struct {
 	FailureMessage string   `json:"message"`
 	FailureStatus  int      `json:"status"`
 	FailureCauses  []string `json:"causes"`
@@ -15,19 +15,19 @@ type webFailure struct {
 
 // ==============================================================> methods
 
-func (f *webFailure) Message() string {
+func (f *networkFailure) Message() string {
 	return f.FailureMessage
 }
 
-func (f *webFailure) Status() int {
+func (f *networkFailure) Status() int {
 	return f.FailureStatus
 }
 
-func (f *webFailure) Causes() []string {
+func (f *networkFailure) Causes() []string {
 	return f.FailureCauses
 }
 
-func (f *webFailure) Error() string {
+func (f *networkFailure) Error() string {
 	return fmt.Sprintf(
 		"message: %s - status: %d - causes: %v",
 		f.FailureMessage, f.FailureStatus, f.FailureCauses,
@@ -36,18 +36,18 @@ func (f *webFailure) Error() string {
 
 // ==============================================================> constructors
 
-type Web struct{}
+type Network struct{}
 
-func (h Web) New(message string, status int, causes []string) Failure {
-	return &webFailure{
+func (Network) New(message string, status int, causes []string) Failure {
+	return &networkFailure{
 		FailureMessage: message,
 		FailureStatus:  status,
 		FailureCauses:  causes,
 	}
 }
 
-func (h Web) NewFromBytes(bytes []byte) (Failure, error) {
-	failure := new(webFailure)
+func (Network) NewFromBytes(bytes []byte) (Failure, error) {
+	failure := new(networkFailure)
 	if err := json.Unmarshal(bytes, failure); err != nil {
 		return nil, errors.New("invalid json")
 	}
@@ -55,48 +55,48 @@ func (h Web) NewFromBytes(bytes []byte) (Failure, error) {
 	return failure, nil
 }
 
-func (h Web) NewBadRequest(message string) Failure {
-	return &webFailure{
+func (Network) NewBadRequest(message string) Failure {
+	return &networkFailure{
 		FailureMessage: message,
 		FailureStatus:  http.StatusBadRequest,
 	}
 }
 
-func (h Web) NewNotFound(message string) Failure {
-	return &webFailure{
+func (Network) NewNotFound(message string) Failure {
+	return &networkFailure{
 		FailureMessage: message,
 		FailureStatus:  http.StatusNotFound,
 	}
 }
 
-func (h Web) NewUnauthorized(message string) Failure {
-	return &webFailure{
+func (Network) NewUnauthorized(message string) Failure {
+	return &networkFailure{
 		FailureMessage: message,
 		FailureStatus:  http.StatusUnauthorized,
 	}
 }
 
-func (h Web) NewUnprocessableEntity(message string) Failure {
-	return &webFailure{
+func (Network) NewUnprocessableEntity(message string) Failure {
+	return &networkFailure{
 		FailureMessage: message,
 		FailureStatus:  http.StatusUnprocessableEntity,
 	}
 }
 
-func (h Web) NewNotImplemented() Failure {
-	return &webFailure{
+func (Network) NewNotImplemented() Failure {
+	return &networkFailure{
 		FailureMessage: "not implemented",
 		FailureStatus:  http.StatusNotImplemented,
 	}
 }
 
-func (h Web) NewInternalServer(message string, errors ...error) Failure {
+func (Network) NewInternalServer(message string, errors ...error) Failure {
 	causes := make([]string, 0, len(errors))
 	for index := 0; index < len(errors); index++ {
 		causes = append(causes, errors[index].Error())
 	}
 
-	return &webFailure{
+	return &networkFailure{
 		FailureMessage: message,
 		FailureStatus:  http.StatusInternalServerError,
 		FailureCauses:  causes,
