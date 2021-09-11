@@ -27,10 +27,8 @@ func (db *database) GetAuthor(ctx context.Context, id uint64) (*models.Author, f
 			return nil, notFoundFailure
 		}
 
-		errStr := "error while getting Author from database"
-		failure := failures.Database{}.NewInternalServer(errStr)
 		span.RecordError(err)
-		return nil, failure
+		return nil, internalFailure
 	}
 
 	return entAuthorToModelsAuthor(entAuthor), nil

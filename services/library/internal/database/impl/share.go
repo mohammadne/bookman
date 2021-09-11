@@ -6,7 +6,10 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-var notFoundFailure = failures.Database{}.NewNotFound("item not found")
+var (
+	notFoundFailure = failures.Database{}.NewNotFound("item not found")
+	internalFailure = failures.Database{}.NewInternalServer("error while getting item from database")
+)
 
 type database struct {
 	tracer trace.Tracer

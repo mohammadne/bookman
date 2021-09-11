@@ -27,10 +27,8 @@ func (db *database) GetBook(ctx context.Context, id uint64) (*models.Book, failu
 			return nil, notFoundFailure
 		}
 
-		errStr := "error while getting Book from database"
-		failure := failures.Database{}.NewInternalServer(errStr)
 		span.RecordError(err)
-		return nil, failure
+		return nil, internalFailure
 	}
 
 	return entBookToModelsBook(entBook), nil

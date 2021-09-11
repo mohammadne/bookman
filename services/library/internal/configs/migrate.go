@@ -4,18 +4,16 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/mohammadne/bookman/library/internal/database"
-	"github.com/mohammadne/bookman/library/internal/network/rest_api"
 	"github.com/mohammadne/bookman/library/pkg/logger"
 )
 
-type server struct {
+type migrate struct {
 	Logger   *logger.Config
 	Database *database.Config
-	Rest     *rest_api.Config
 }
 
-func Server(env string) *server {
-	config := &server{}
+func Migrate(env string) *migrate {
+	config := &migrate{}
 
 	switch env {
 	case "prod":
@@ -27,7 +25,7 @@ func Server(env string) *server {
 	return config
 }
 
-func (config *server) loadProd() {
+func (config *migrate) loadProd() {
 	{
 		// TODO: temp passing config
 		if err := godotenv.Load(); err != nil {
@@ -37,19 +35,15 @@ func (config *server) loadProd() {
 
 	config.Logger = &logger.Config{}
 	config.Database = &database.Config{}
-	config.Rest = &rest_api.Config{}
 
 	// process
 	envconfig.MustProcess("library", config)
 	envconfig.MustProcess("library_logger", config.Logger)
 	envconfig.MustProcess("library_database", config.Database)
-	envconfig.MustProcess("library_rest_api", config.Rest)
 }
 
-func (config *server) loadDev() {
+func (config *migrate) loadDev() {
 	config.Logger = &logger.Config{}
 
 	config.Database = &database.Config{}
-
-	config.Rest = &rest_api.Config{}
 }
