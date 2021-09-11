@@ -6,3 +6,6 @@
 .idea
 
 .env
+
+/internal/database/ent/*
+!/internal/database/ent/schema
