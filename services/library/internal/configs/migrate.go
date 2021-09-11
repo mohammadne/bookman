@@ -1,7 +1,6 @@
 package configs
 
 import (
-	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/mohammadne/bookman/library/internal/database"
 	"github.com/mohammadne/bookman/library/pkg/logger"
@@ -26,13 +25,6 @@ func Migrate(env string) *migrate {
 }
 
 func (config *migrate) loadProd() {
-	{
-		// TODO: temp passing config
-		if err := godotenv.Load(); err != nil {
-			panic(err)
-		}
-	}
-
 	config.Logger = &logger.Config{}
 	config.Database = &database.Config{}
 
@@ -43,7 +35,21 @@ func (config *migrate) loadProd() {
 }
 
 func (config *migrate) loadDev() {
-	config.Logger = &logger.Config{}
+	config.Logger = &logger.Config{
+		Development:      true,
+		EnableCaller:     true,
+		EnableStacktrace: false,
+		Encoding:         "console",
+		Level:            "warn",
+	}
 
-	config.Database = &database.Config{}
+	config.Database = &database.Config{
+		Driver:       "mysql",
+		Host:         "localhost",
+		Port:         "3306",
+		User:         "root",
+		Password:     "password",
+		DatabaseName: "bookman",
+		SSLMode:      "",
+	}
 }
