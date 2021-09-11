@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/mohammadne/bookman/library/internal/models/pb"
-	"github.com/mohammadne/bookman/library/pkg/failures"
-	"github.com/mohammadne/bookman/library/pkg/logger"
+	"github.com/mohammadne/bookman/user/internal/models/pb"
+	"github.com/mohammadne/bookman/user/pkg/failures"
+	"github.com/mohammadne/bookman/user/pkg/logger"
 	"go.opentelemetry.io/otel/trace"
 	grpcPkg "google.golang.org/grpc"
 )
@@ -24,8 +24,8 @@ type authClient struct {
 func NewAuthClient(cfg *Config, lg logger.Logger, tracer trace.Tracer) (*authClient, error) {
 	client := &authClient{logger: lg, tracer: tracer}
 
-	address := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
-	authConnection, err := grpcPkg.Dial(address, grpcPkg.WithInsecure())
+	Address := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
+	authConnection, err := grpcPkg.Dial(Address, grpcPkg.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ var (
 )
 
 func (client *authClient) GetTokenMetadata(ctx context.Context, token string) (uint64, failures.Failure) {
-	ctx, span := client.tracer.Start(ctx, "database.author.get")
+	ctx, span := client.tracer.Start(ctx, "network.grpc.client.auth.get_token_metadata")
 	defer span.End()
 
 	contract := &pb.TokenContract{Token: token}

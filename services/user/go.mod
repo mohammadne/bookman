@@ -10,6 +10,7 @@ require (
 	github.com/mohammadne/go-pkgs v0.0.0-20210823113340-8d1272226d3e
 	github.com/prometheus/client_golang v1.11.0
 	github.com/spf13/cobra v1.2.1
+	go.opentelemetry.io/otel/trace v0.20.0 // indirect
 	go.uber.org/zap v1.19.0
 	google.golang.org/grpc v1.38.0
 	google.golang.org/protobuf v1.26.0

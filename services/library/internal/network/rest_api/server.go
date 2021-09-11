@@ -43,9 +43,9 @@ func (rest *restApi) setupRoutes() {
 }
 
 func (rest *restApi) Serve(<-chan struct{}) {
-	Address := fmt.Sprintf("%s:%s", rest.config.Host, rest.config.Port)
-	rest.logger.Info("starting server", logger.String("address", Address))
-	if err := rest.echo.Start(Address); err != nil {
+	address := fmt.Sprintf("%s:%s", rest.config.Host, rest.config.Port)
+	rest.logger.Info("starting server", logger.String("address", address))
+	if err := rest.echo.Start(address); err != nil {
 		rest.logger.Fatal("starting server failed", logger.Error(err))
 	}
 }
