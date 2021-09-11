@@ -8,7 +8,7 @@ import (
 	"github.com/mohammadne/bookman/library/internal/models"
 )
 
-type book interface {
+type Book interface {
 	GetBook(ctx context.Context, id uint64) (*models.Book, error)
 }
 

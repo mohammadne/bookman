@@ -7,7 +7,7 @@ import (
 	"github.com/mohammadne/bookman/library/internal/database/ent/migrate"
 )
 
-type migration interface {
+type Migration interface {
 	MigratePreview(ctx context.Context, writer io.Writer) error
 	Migrate(ctx context.Context) error
 }

@@ -8,14 +8,17 @@ import (
 	impl "github.com/mohammadne/bookman/library/internal/database/impl"
 )
 
-const dataSourceSchema = "host=%s port=%d user=%s dbname=%s password=%s sslmode=%s"
+type Database interface {
+	impl.Author
+	impl.Book
+	impl.Migration
+}
 
 // NewClient creates an ent database connection based on entry config.
-func NewClient(config *Config) (impl.Database, error) {
+func NewClient(config *Config) (Database, error) {
 	dataSourceName := fmt.Sprintf(
-		dataSourceSchema,
-		config.Host, config.Port, config.User,
-		config.DatabaseName, config.Password, config.SSLMode,
+		"%s:%s@tcp(%s)/%s?charset=utf8",
+		config.User, config.Password, config.Host, config.DatabaseName,
 	)
 
 	client, err := ent.Open(config.Driver, dataSourceName)

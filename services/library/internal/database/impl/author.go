@@ -8,7 +8,7 @@ import (
 	"github.com/mohammadne/bookman/library/internal/models"
 )
 
-type author interface {
+type Author interface {
 	GetAuthor(ctx context.Context, id uint64) (*models.Author, error)
 }
 
