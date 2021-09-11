@@ -31,15 +31,18 @@ func main(cmd *cobra.Command, args []string) {
 	lg := logger.NewZap(config.Logger)
 	tracer, err := tracer.New(config.Tracer)
 	if err != nil {
-		lg.Panic("", logger.Error(err))
+		lg.Panic("error getting tracer object", logger.Error(err))
 	}
 
 	db, err := database.NewClient(config.Database)
 	if err != nil {
-		lg.Panic("", logger.Error(err))
+		lg.Panic("error getting database client", logger.Error(err))
 	}
 
-	authGrpc := grpc.NewAuthClient(config.AuthGrpc, lg, tracer)
+	authGrpc, err := grpc.NewAuthClient(config.AuthGrpc, lg, tracer)
+	if err != nil {
+		lg.Panic("error getting auth grpc connection", logger.Error(err))
+	}
 
 	rest := rest_api.NewServer(config.RestApi, lg, tracer, db, authGrpc)
 	rest.Serve(nil)

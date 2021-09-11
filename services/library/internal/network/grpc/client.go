@@ -21,21 +21,17 @@ type authClient struct {
 	api    pb.AuthClient
 }
 
-func NewAuthClient(cfg *Config, lg logger.Logger, tracer trace.Tracer) *authClient {
+func NewAuthClient(cfg *Config, lg logger.Logger, tracer trace.Tracer) (*authClient, error) {
 	client := &authClient{logger: lg, tracer: tracer}
 
 	Address := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
 	authConnection, err := grpcPkg.Dial(Address, grpcPkg.WithInsecure())
 	if err != nil {
-		lg.Fatal(
-			"error getting auth grpc connection",
-			logger.String("address", Address),
-			logger.Error(err),
-		)
+		return nil, err
 	}
 	client.api = pb.NewAuthClient(authConnection)
 
-	return client
+	return client, nil
 }
 
 var (
