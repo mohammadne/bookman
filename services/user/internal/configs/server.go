@@ -2,9 +2,9 @@ package configs
 
 import (
 	"github.com/kelseyhightower/envconfig"
-	"github.com/mohammadne/bookman/user/internal/database"
 	"github.com/mohammadne/bookman/user/internal/network/grpc"
 	"github.com/mohammadne/bookman/user/internal/network/rest_api"
+	"github.com/mohammadne/bookman/user/pkg/database"
 	"github.com/mohammadne/bookman/user/pkg/logger"
 	"github.com/mohammadne/bookman/user/pkg/tracer"
 )
@@ -64,15 +64,17 @@ func (config *server) loadDev() {
 		Subsystem:  "library",
 	}
 
-	config.Database = &database.Config{
-		Driver:       "mysql",
-		Host:         "localhost",
-		Port:         "3306",
-		User:         "root",
-		Password:     "password",
-		DatabaseName: "bookman",
-		SSLMode:      "",
-	}
+	config.Database = &database.Config{}
+
+	// config.Database = &database.Config{
+	// 	Driver:       "mysql",
+	// 	Host:         "localhost",
+	// 	Port:         "3306",
+	// 	User:         "root",
+	// 	Password:     "password",
+	// 	DatabaseName: "bookman",
+	// 	SSLMode:      "",
+	// }
 
 	config.RestApi = &rest_api.Config{
 		Host: "localhost",

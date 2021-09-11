@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
-	"github.com/mohammadne/go-pkgs/failures"
-	"github.com/mohammadne/go-pkgs/logger"
+	"github.com/mohammadne/bookman/user/pkg/failures"
+	"github.com/mohammadne/bookman/user/pkg/logger"
 )
 
 func (rest *restEcho) authenticate(next echo.HandlerFunc) echo.HandlerFunc {

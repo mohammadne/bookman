@@ -6,8 +6,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/mohammadne/bookman/user/internal/models"
-	"github.com/mohammadne/go-pkgs/failures"
-	"github.com/mohammadne/go-pkgs/logger"
+	"github.com/mohammadne/bookman/user/pkg/failures"
+	"github.com/mohammadne/bookman/user/pkg/logger"
 )
 
 // get is responsible to provide HTTP Get Location functionality

@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/mohammadne/bookman/user/internal/database"
 	grpc_client "github.com/mohammadne/bookman/user/internal/network/grpc/clients"
-	"github.com/mohammadne/go-pkgs/logger"
+	"github.com/mohammadne/bookman/user/pkg/logger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 

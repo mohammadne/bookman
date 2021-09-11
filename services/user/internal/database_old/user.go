@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/mohammadne/bookman/user/internal/models"
+	"github.com/mohammadne/bookman/user/pkg/failures"
+	"github.com/mohammadne/bookman/user/pkg/logger"
 	"github.com/mohammadne/bookman/user/pkg/utils"
-	"github.com/mohammadne/go-pkgs/failures"
-	"github.com/mohammadne/go-pkgs/logger"
 )
 
 const (

@@ -12,10 +12,6 @@ import (
 )
 
 type mysql struct {
-	// injected dependencies
-	config *Config
-
-	// internal dependencies
 	connection *sql.DB
 }
 
@@ -47,7 +43,7 @@ func NewMysqlDatabase(cfg *Config) Database {
 		return nil
 	}
 
-	return &mysql{config: cfg, connection: client}
+	return &mysql{connection: client}
 }
 
 var (

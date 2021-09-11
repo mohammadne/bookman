@@ -6,8 +6,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/mohammadne/bookman/user/internal/models"
-	"github.com/mohammadne/go-pkgs/failures"
-	"github.com/mohammadne/go-pkgs/logger"
+	"github.com/mohammadne/bookman/user/pkg/failures"
+	"github.com/mohammadne/bookman/user/pkg/logger"
 )
 
 type Database interface {

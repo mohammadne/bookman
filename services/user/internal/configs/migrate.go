@@ -2,8 +2,8 @@ package configs
 
 import (
 	"github.com/kelseyhightower/envconfig"
-	"github.com/mohammadne/bookman/library/internal/database"
-	"github.com/mohammadne/bookman/library/pkg/logger"
+	"github.com/mohammadne/bookman/user/pkg/database"
+	"github.com/mohammadne/bookman/user/pkg/logger"
 )
 
 type migrate struct {
