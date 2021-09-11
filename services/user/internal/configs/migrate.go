@@ -44,12 +44,10 @@ func (config *migrate) loadDev() {
 	}
 
 	config.Database = &database.Config{
-		Driver:       "mysql",
-		Host:         "localhost",
-		Port:         "3306",
-		User:         "root",
-		Password:     "password",
-		DatabaseName: "bookman",
-		SSLMode:      "",
+		Username: "root",
+		Password: "password",
+		Host:     "localhost",
+		Port:     "3306",
+		Schema:   "bookman",
 	}
 }

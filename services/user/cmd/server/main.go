@@ -1,71 +1,56 @@
 package server
 
 import (
-	"fmt"
-
-	"github.com/mohammadne/bookman/user/config"
-	"github.com/mohammadne/bookman/user/internal/database"
+	"github.com/mohammadne/bookman/user/internal/configs"
 	"github.com/mohammadne/bookman/user/internal/network"
 	"github.com/mohammadne/bookman/user/internal/network/grpc"
-	grpc_client "github.com/mohammadne/bookman/user/internal/network/grpc/clients"
-	"github.com/mohammadne/bookman/user/internal/network/rest"
+	"github.com/mohammadne/bookman/user/internal/network/rest_api"
+
 	"github.com/mohammadne/bookman/user/pkg/logger"
+	"github.com/mohammadne/bookman/user/pkg/tracer"
 	"github.com/spf13/cobra"
 )
 
 const (
 	use   = "server"
 	short = "run server"
-
-	// server-cmd flags usage
-	envUsage = "setting environment, default is dev"
 )
 
 func Command() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   use,
-		Short: short,
-		Run: func(cmd *cobra.Command, args []string) {
-			env, err := cmd.Flags().GetString("env")
-			if err != nil {
-				fmt.Println(err)
-			}
+	cmd := &cobra.Command{Use: use, Short: short, Run: main}
 
-			main(config.EnvFromFlag(env))
-		},
-	}
-
-	// set server-cmd flags
-	cmd.Flags().StringP("env", "e", "", envUsage)
+	envFlag := "set config environment, default is dev"
+	cmd.Flags().StringP("env", "e", "", envFlag)
 
 	return cmd
 }
 
-func main(environment config.Environment) {
-	// done channel is a trick to pause main groutine
-	done := make(chan struct{})
+func main(cmd *cobra.Command, args []string) {
+	env := cmd.Flag("env").Value.String()
+	config := configs.Server(env)
 
-	//
-	cfg := config.Load(environment)
+	lg := logger.NewZap(config.Logger)
+	tracer, err := tracer.New(config.Tracer)
+	if err != nil {
+		lg.Panic("error getting tracer object", logger.Error(err))
+	}
 
-	//
-	log := logger.NewZap(cfg.Logger)
+	authGrpc, err := grpc.NewAuthClient(config.AuthGrpc, lg, tracer)
+	if err != nil {
+		lg.Panic("error getting auth grpc connection", logger.Error(err))
+	}
 
-	db := database.NewMysqlDatabase(cfg.Database, log)
-
-	authGrpc := grpc_client.NewAuth(cfg.GrpcAuth, log)
-	authGrpc.Setup()
+	// db := database.NewMysqlDatabase(cfg.Database, lg)
+	// db := interface{}
 
 	// serving application servers
 	servers := []network.Server{
-		rest.New(cfg.Rest, log, db, authGrpc),
-		grpc.NewServer(cfg.GrpcServer, log, db),
+		rest_api.New(config.RestApi, lg, nil, authGrpc),
+		grpc.NewServer(config.UserGrpc, lg, nil),
 	}
 
 	for _, server := range servers {
-		go server.Serve(done)
+		go server.Serve(nil)
 	}
 
-	// pause main groutine
-	<-done
 }

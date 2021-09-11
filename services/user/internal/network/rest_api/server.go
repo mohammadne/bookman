@@ -5,7 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/mohammadne/bookman/user/internal/database"
-	grpc_client "github.com/mohammadne/bookman/user/internal/network/grpc/clients"
+	"github.com/mohammadne/bookman/user/internal/network/grpc"
 	"github.com/mohammadne/bookman/user/pkg/logger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -15,14 +15,14 @@ type restEcho struct {
 	config   *Config
 	logger   logger.Logger
 	database database.Database
-	authGrpc grpc_client.Auth
+	authGrpc grpc.AuthClient
 
 	// internal dependencies
 	echo *echo.Echo
 }
 
-func New(cfg *Config, log logger.Logger, db database.Database, ag grpc_client.Auth) *restEcho {
-	handler := &restEcho{config: cfg, logger: log, database: db, authGrpc: ag}
+func New(cfg *Config, log logger.Logger, db database.Database, ac grpc.AuthClient) *restEcho {
+	handler := &restEcho{config: cfg, logger: log, database: db, authGrpc: ac}
 
 	handler.echo = echo.New()
 	handler.echo.HideBanner = true

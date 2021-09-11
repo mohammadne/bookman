@@ -26,7 +26,7 @@ const (
 	errPrepareStatement = "error when tying to prepare statement"
 )
 
-func NewMysqlDatabase(cfg *Config) Database {
+func NewMysql(cfg *Config) Database {
 	dataSourceName := fmt.Sprintf(
 		"%s:%s@tcp(%s)/%s?charset=utf8",
 		cfg.Username, cfg.Password, cfg.Host, cfg.Schema,
