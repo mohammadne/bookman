@@ -1,5 +1,6 @@
 package grpc
 
 type Config struct {
-	URL string
+	Host string
+	Port string
 }

@@ -27,11 +27,12 @@ func NewAuthClient(config *Config, logger logger.Logger, tracer trace.Tracer) *a
 }
 
 func (client *authClient) Setup() {
-	authConnection, err := grpcPkg.Dial(client.config.URL, grpcPkg.WithInsecure())
+	Address := fmt.Sprintf("%s:%s", client.config.Host, client.config.Port)
+	authConnection, err := grpcPkg.Dial(Address, grpcPkg.WithInsecure())
 	if err != nil {
 		client.logger.Fatal(
 			"error getting auth grpc connection",
-			logger.String("address", client.config.URL),
+			logger.String("address", Address),
 			logger.Error(err),
 		)
 	}

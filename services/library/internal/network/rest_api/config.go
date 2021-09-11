@@ -1,5 +1,6 @@
 package rest_api
 
 type Config struct {
-	URL string
+	Host string
+	Port string
 }

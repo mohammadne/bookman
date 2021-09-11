@@ -1,17 +1,20 @@
 package configs
 
 import (
-	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/mohammadne/bookman/library/internal/database"
+	"github.com/mohammadne/bookman/library/internal/network/grpc"
 	"github.com/mohammadne/bookman/library/internal/network/rest_api"
 	"github.com/mohammadne/bookman/library/pkg/logger"
+	"github.com/mohammadne/bookman/library/pkg/tracer"
 )
 
 type server struct {
 	Logger   *logger.Config
+	Tracer   *tracer.Config
 	Database *database.Config
-	Rest     *rest_api.Config
+	RestApi  *rest_api.Config
+	AuthGrpc *grpc.Config
 }
 
 func Server(env string) *server {
@@ -28,28 +31,56 @@ func Server(env string) *server {
 }
 
 func (config *server) loadProd() {
-	{
-		// TODO: temp passing config
-		if err := godotenv.Load(); err != nil {
-			panic(err)
-		}
-	}
-
 	config.Logger = &logger.Config{}
+	config.Tracer = &tracer.Config{}
 	config.Database = &database.Config{}
-	config.Rest = &rest_api.Config{}
+	config.RestApi = &rest_api.Config{}
+	config.AuthGrpc = &grpc.Config{}
 
 	// process
 	envconfig.MustProcess("library", config)
 	envconfig.MustProcess("library_logger", config.Logger)
+	envconfig.MustProcess("library_tracer", config.Tracer)
 	envconfig.MustProcess("library_database", config.Database)
-	envconfig.MustProcess("library_rest_api", config.Rest)
+	envconfig.MustProcess("library_rest_api", config.RestApi)
+	envconfig.MustProcess("auth_grpc", config.AuthGrpc)
 }
 
 func (config *server) loadDev() {
-	config.Logger = &logger.Config{}
+	config.Logger = &logger.Config{
+		Development:      true,
+		EnableCaller:     true,
+		EnableStacktrace: false,
+		Encoding:         "console",
+		Level:            "warn",
+	}
 
-	config.Database = &database.Config{}
+	config.Tracer = &tracer.Config{
+		Enabled:    false,
+		Host:       "",
+		Port:       "",
+		SampleRate: 0,
+		Namespace:  "bookman",
+		Subsystem:  "library",
+	}
 
-	config.Rest = &rest_api.Config{}
+	config.Database = &database.Config{
+		Driver:       "mysql",
+		Host:         "localhost",
+		Port:         "3306",
+		User:         "root",
+		Password:     "password",
+		DatabaseName: "bookman",
+		SSLMode:      "",
+	}
+
+	config.RestApi = &rest_api.Config{
+		Host: "localhost",
+		Port: "8082",
+	}
+
+	config.AuthGrpc = &grpc.Config{
+		Host: "localhost",
+		Port: "4040",
+	}
 }

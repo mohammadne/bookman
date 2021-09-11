@@ -11,7 +11,11 @@ require (
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/prometheus/client_golang v0.9.3
 	github.com/spf13/cobra v1.2.1
-	go.opentelemetry.io/otel/trace v0.20.0
+	go.opentelemetry.io/otel v1.0.0-RC3
+	go.opentelemetry.io/otel/exporters/jaeger v1.0.0-RC3
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.0.0-RC3
+	go.opentelemetry.io/otel/sdk v1.0.0-RC3
+	go.opentelemetry.io/otel/trace v1.0.0-RC3
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.19.0

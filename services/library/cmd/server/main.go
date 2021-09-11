@@ -2,6 +2,11 @@ package server
 
 import (
 	"github.com/mohammadne/bookman/library/internal/configs"
+	"github.com/mohammadne/bookman/library/internal/database"
+	"github.com/mohammadne/bookman/library/internal/network/grpc"
+	"github.com/mohammadne/bookman/library/internal/network/rest_api"
+	"github.com/mohammadne/bookman/library/pkg/logger"
+	"github.com/mohammadne/bookman/library/pkg/tracer"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +27,24 @@ func Command() *cobra.Command {
 func main(cmd *cobra.Command, args []string) {
 	env := cmd.Flag("env").Value.String()
 	config := configs.Server(env)
-	_ = config
+
+	lg := logger.NewZap(config.Logger)
+	tracer, err := tracer.New(config.Tracer)
+	if err != nil {
+		lg.Panic("", logger.Error(err))
+	}
+
+	db, err := database.NewClient(config.Database)
+	if err != nil {
+		lg.Panic("", logger.Error(err))
+	}
+
+	authGrpc := grpc.NewAuthClient(config.AuthGrpc, lg, tracer)
+	authGrpc.Setup()
+
+	rest := rest_api.NewServer(config.RestApi, lg, tracer, db, authGrpc)
+	rest.Serve(nil)
+
 	// quit := make(chan os.Signal, 1)
 	// signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 

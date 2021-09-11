@@ -1,6 +1,8 @@
 package rest_api
 
 import (
+	"fmt"
+
 	"github.com/labstack/echo/v4"
 	"github.com/mohammadne/bookman/library/internal/database"
 	"github.com/mohammadne/bookman/library/internal/network/grpc"
@@ -20,8 +22,8 @@ type restApi struct {
 	echo *echo.Echo
 }
 
-func NewServer(cfg *Config, log logger.Logger, db database.Database, ac grpc.AuthClient) *restApi {
-	rest := &restApi{config: cfg, logger: log, database: db, authGrpc: ac}
+func NewServer(cfg *Config, lg logger.Logger, tr trace.Tracer, db database.Database, ac grpc.AuthClient) *restApi {
+	rest := &restApi{config: cfg, logger: lg, tracer: tr, database: db, authGrpc: ac}
 
 	rest.echo = echo.New()
 	rest.echo.HideBanner = true
@@ -41,12 +43,9 @@ func (rest *restApi) setupRoutes() {
 }
 
 func (rest *restApi) Serve(<-chan struct{}) {
-	rest.logger.Info(
-		"starting server",
-		logger.String("address", rest.config.URL),
-	)
-
-	if err := rest.echo.Start(rest.config.URL); err != nil {
+	Address := fmt.Sprintf("%s:%s", rest.config.Host, rest.config.Port)
+	rest.logger.Info("starting server", logger.String("address", Address))
+	if err := rest.echo.Start(Address); err != nil {
 		rest.logger.Fatal("starting server failed", logger.Error(err))
 	}
 }
