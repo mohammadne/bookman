@@ -13,4 +13,7 @@ func Command() *cobra.Command {
 	return &cobra.Command{Use: use, Short: short, Run: main}
 }
 
-func main(cmd *cobra.Command, args []string) {}
+func main(cmd *cobra.Command, args []string) {
+	// a, _ := database.NewClient(nil)
+	// a.Migrate(nil)
+}

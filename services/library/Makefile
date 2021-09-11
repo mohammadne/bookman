@@ -7,7 +7,7 @@ ent-get:
 	go get -u $(ent-binary)
 
 ent-init: 
-	go run $(ent-binary) init User --target=$(ent-path)
+	go run $(ent-binary) init Book Author --target=$(ent-path)
 
 ent-generate:
 	go run -mod=readonly $(ent-binary) generate $(ent-path)
