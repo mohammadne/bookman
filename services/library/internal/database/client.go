@@ -4,14 +4,14 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
-	database_impl "github.com/mohammadne/bookman/library/internal/database/calls"
 	"github.com/mohammadne/bookman/library/internal/database/ent"
+	impl "github.com/mohammadne/bookman/library/internal/database/impl"
 )
 
 const dataSourceSchema = "host=%s port=%d user=%s dbname=%s password=%s sslmode=%s"
 
 // NewClient creates an ent database connection based on entry config.
-func NewClient(config *Config) (database_impl.Database, error) {
+func NewClient(config *Config) (impl.Database, error) {
 	dataSourceName := fmt.Sprintf(
 		dataSourceSchema,
 		config.Host, config.Port, config.User,
@@ -19,5 +19,5 @@ func NewClient(config *Config) (database_impl.Database, error) {
 	)
 
 	client, err := ent.Open(config.Driver, dataSourceName)
-	return database_impl.New(client), err
+	return impl.New(client), err
 }

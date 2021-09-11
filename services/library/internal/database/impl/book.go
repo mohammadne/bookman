@@ -9,11 +9,15 @@ import (
 )
 
 type book interface {
-	GetBook(ctx context.Context, id uint64) *models.Book
+	GetBook(ctx context.Context, id uint64) (*models.Book, error)
 }
 
-func (db *database) GetBook(ctx context.Context, id uint64) *models.Book {
-	ctx, span := db.tracer.Start(ctx, "database.book.get_book")
+func entBookToModelsBook(entCall *ent.Book) *models.Book {
+	return nil
+}
+
+func (db *database) GetBook(ctx context.Context, id uint64) (*models.Book, error) {
+	ctx, span := db.tracer.Start(ctx, "database.book.get")
 	defer span.End()
 
 	entBook, err := db.client.Book.Get(ctx, int(id))
@@ -23,10 +27,10 @@ func (db *database) GetBook(ctx context.Context, id uint64) *models.Book {
 			return nil, ErrNotFound
 		}
 
-		err = fmt.Errorf("error while getting call from database, error: %w", err)
+		err = fmt.Errorf("error while getting Book from database, error: %w", err)
 		span.RecordError(err)
 		return nil, err
 	}
 
-	return nil
+	return entBookToModelsBook(entBook), nil
 }
