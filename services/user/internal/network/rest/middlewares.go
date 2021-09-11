@@ -23,7 +23,7 @@ func (rest *restEcho) authenticate(next echo.HandlerFunc) echo.HandlerFunc {
 			return ctx.JSON(failure.Status(), failure)
 		}
 
-		ctx.Set("token_user_id", strconv.FormatUint(userId, 10))
+		ctx.Set("self_token", strconv.FormatUint(userId, 10))
 		return next(ctx)
 	}
 }

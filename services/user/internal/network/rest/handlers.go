@@ -21,7 +21,7 @@ func (rest *restEcho) getUser(ctx echo.Context) error {
 }
 
 func (rest *restEcho) getMyUser(ctx echo.Context) error {
-	user, failure := rest.getUserByIdString(ctx.Get("token_user_id").(string))
+	user, failure := rest.getUserByIdString(ctx.Get("self_token").(string))
 	if failure != nil {
 		rest.logger.Error(failure.Message(), logger.Error(failure))
 		return ctx.JSON(failure.Status(), failure)

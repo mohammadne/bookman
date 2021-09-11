@@ -1,13 +1,12 @@
 package database_impl
 
 import (
-	"errors"
-
 	"github.com/mohammadne/bookman/library/internal/database/ent"
+	"github.com/mohammadne/bookman/library/pkg/failures"
 	"go.opentelemetry.io/otel/trace"
 )
 
-var ErrNotFound = errors.New("item not found")
+var notFoundFailure = failures.Database{}.NewNotFound("item not found")
 
 type database struct {
 	tracer trace.Tracer

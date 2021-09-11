@@ -2,34 +2,35 @@ package database_impl
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/mohammadne/bookman/library/internal/database/ent"
 	"github.com/mohammadne/bookman/library/internal/models"
+	"github.com/mohammadne/bookman/library/pkg/failures"
 )
 
 type Book interface {
-	GetBook(ctx context.Context, id uint64) (*models.Book, error)
+	GetBook(ctx context.Context, id uint64) (*models.Book, failures.Failure)
 }
 
 func entBookToModelsBook(entCall *ent.Book) *models.Book {
 	return nil
 }
 
-func (db *database) GetBook(ctx context.Context, id uint64) (*models.Book, error) {
+func (db *database) GetBook(ctx context.Context, id uint64) (*models.Book, failures.Failure) {
 	ctx, span := db.tracer.Start(ctx, "database.book.get")
 	defer span.End()
 
 	entBook, err := db.client.Book.Get(ctx, int(id))
 	if err != nil {
 		if ent.IsNotFound(err) {
-			span.RecordError(ErrNotFound)
-			return nil, ErrNotFound
+			span.RecordError(notFoundFailure)
+			return nil, notFoundFailure
 		}
 
-		err = fmt.Errorf("error while getting Book from database, error: %w", err)
+		errStr := "error while getting Book from database"
+		failure := failures.Database{}.NewInternalServer(errStr)
 		span.RecordError(err)
-		return nil, err
+		return nil, failure
 	}
 
 	return entBookToModelsBook(entBook), nil
