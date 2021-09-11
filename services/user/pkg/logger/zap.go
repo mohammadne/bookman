@@ -3,7 +3,6 @@ package logger
 import (
 	"os"
 
-	"github.com/mohammadne/go-pkgs/logger"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -17,7 +16,7 @@ type zapLogger struct {
 	instance *zap.Logger
 }
 
-func NewZap(cfg *Config) logger.Logger {
+func NewZap(cfg *Config) Logger {
 	zLog := &zapLogger{config: cfg}
 
 	zLog.instance = zap.New(
@@ -91,26 +90,57 @@ func (l *zapLogger) getOptions() []zap.Option {
 	return options
 }
 
-func (l *zapLogger) Debug(msg string, fields ...logger.Field) {
+func (l *zapLogger) Debug(msg string, fields ...Field) {
 	l.instance.Debug(msg, convertFields(fields...)...)
 }
 
-func (l *zapLogger) Info(msg string, fields ...logger.Field) {
+func (l *zapLogger) Info(msg string, fields ...Field) {
 	l.instance.Info(msg, convertFields(fields...)...)
 }
 
-func (l *zapLogger) Warn(msg string, fields ...logger.Field) {
+func (l *zapLogger) Warn(msg string, fields ...Field) {
 	l.instance.Warn(msg, convertFields(fields...)...)
 }
 
-func (l *zapLogger) Error(msg string, fields ...logger.Field) {
+func (l *zapLogger) Error(msg string, fields ...Field) {
 	l.instance.Error(msg, convertFields(fields...)...)
 }
 
-func (l *zapLogger) Panic(msg string, fields ...logger.Field) {
+func (l *zapLogger) Panic(msg string, fields ...Field) {
 	l.instance.Panic(msg, convertFields(fields...)...)
 }
 
-func (l *zapLogger) Fatal(msg string, fields ...logger.Field) {
+func (l *zapLogger) Fatal(msg string, fields ...Field) {
 	l.instance.Fatal(msg, convertFields(fields...)...)
+}
+
+// convertFields converts Field To ZapField
+func convertFields(fields ...Field) []zapcore.Field {
+	zapFileds := make([]zapcore.Field, 0, len(fields))
+
+	for index := 0; index < len(fields); index++ {
+		zapField := convertField(fields[index])
+		zapFileds = append(zapFileds, zapField)
+	}
+
+	return zapFileds
+}
+
+func convertField(field Field) zapcore.Field {
+	switch field.Type {
+	case UnknownType:
+		return zap.Any(field.Key, field.Value)
+	case BoolType:
+		return zap.Bool(field.Key, field.Value.(bool))
+	case IntType:
+		return zap.Int(field.Key, field.Value.(int))
+	case Float64Type:
+		return zap.Float64(field.Key, field.Value.(float64))
+	case StringType:
+		return zap.String(field.Key, field.Value.(string))
+	case ErrorType:
+		return zap.Error(field.Value.(error))
+	}
+
+	return zapcore.Field{}
 }

@@ -14,14 +14,9 @@ const (
 )
 
 func main() {
-	// root subcommands
-	serverCmd := server.Command()
-
-	// create root command and add sub-commands to it
 	cmd := &cobra.Command{Use: use, Short: short, Long: long}
-	cmd.AddCommand(serverCmd)
+	cmd.AddCommand(server.Command())
 
-	// run cobra root cmd
 	if err := cmd.Execute(); err != nil {
 		panic(map[string]interface{}{"err": err, "msg": errExecuteCMD})
 	}

@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/mohammadne/bookman/library/pkg/failures"
-	"github.com/mohammadne/bookman/library/pkg/logger"
+	"github.com/mohammadne/bookman/user/pkg/failures"
+	"github.com/mohammadne/bookman/user/pkg/logger"
 )
 
 type mysql struct {

@@ -1,6 +1,6 @@
 package database
 
-import "github.com/mohammadne/bookman/library/pkg/failures"
+import "github.com/mohammadne/bookman/user/pkg/failures"
 
 type Database interface {
 	Create(query string, args []interface{}) (int64, failures.Failure)
