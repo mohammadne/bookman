@@ -11,14 +11,16 @@ import (
 )
 
 func (rest *restEcho) authenticate(next echo.HandlerFunc) echo.HandlerFunc {
+	// span, ctx := rest.tra
+
 	return func(ctx echo.Context) error {
 		token, failure := extractToken(ctx.Request())
 		if failure != nil {
 			rest.logger.Error("invalid token", logger.Error(failure))
 			return ctx.JSON(failure.Status(), failure)
 		}
-
-		userId, failure := rest.authGrpc.GetTokenMetadata(token)
+		// TODO : pass context
+		userId, failure := rest.authGrpc.GetTokenMetadata(nil, token)
 		if failure != nil || userId == 0 {
 			return ctx.JSON(failure.Status(), failure)
 		}
@@ -29,8 +31,8 @@ func (rest *restEcho) authenticate(next echo.HandlerFunc) echo.HandlerFunc {
 }
 
 var (
-	missingAuth = failures.Rest{}.NewUnauthorized("authorization header is missing")
-	invalidAuth = failures.Rest{}.NewUnauthorized("authorization header is malformed")
+	missingAuth = failures.Network{}.NewUnauthorized("authorization header is missing")
+	invalidAuth = failures.Network{}.NewUnauthorized("authorization header is malformed")
 )
 
 func extractToken(r *http.Request) (string, failures.Failure) {

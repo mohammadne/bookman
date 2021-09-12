@@ -51,7 +51,7 @@ var (
 	failureDuplicate = failures.Database{}.NewBadRequest("entry exists")
 )
 
-func (db *mysql) Create(query string, args []interface{}) (int64, failures.Failure) {
+func (db *mysql) Create(query string, args []interface{}) (uint64, failures.Failure) {
 	stmt, err := db.connection.Prepare(query)
 	if err != nil {
 		return 0, failures.Database{}.NewInternalServer(errPrepareStatement, err)
@@ -72,7 +72,7 @@ func (db *mysql) Create(query string, args []interface{}) (int64, failures.Failu
 		return 0, failureCreate
 	}
 
-	return id, nil
+	return uint64(id), nil
 }
 
 var (

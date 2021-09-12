@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/mohammadne/bookman/user/internal/database"
 	"github.com/mohammadne/bookman/user/internal/models"
 	"github.com/mohammadne/bookman/user/internal/models/pb"
+	"github.com/mohammadne/bookman/user/internal/storage"
 	"github.com/mohammadne/bookman/user/pkg/failures"
 	"github.com/mohammadne/bookman/user/pkg/logger"
 
@@ -16,17 +16,17 @@ import (
 
 type grpcServer struct {
 	// injected parameters
-	config   *Config
-	logger   logger.Logger
-	database database.Database
+	config  *Config
+	logger  logger.Logger
+	storage storage.Storage
 
 	// internal dependencies
 	server *grpc.Server
 	pb.UnimplementedUserServer
 }
 
-func NewServer(cfg *Config, log logger.Logger, db database.Database) *grpcServer {
-	s := &grpcServer{config: cfg, logger: log, database: db}
+func NewServer(cfg *Config, log logger.Logger, storage storage.Storage) *grpcServer {
+	s := &grpcServer{config: cfg, logger: log, storage: storage}
 
 	s.server = grpc.NewServer()
 	pb.RegisterUserServer(s.server, s)
@@ -46,13 +46,13 @@ func (s *grpcServer) Serve(<-chan struct{}) {
 
 func (server *grpcServer) CreateUser(_ context.Context, credentials *pb.UserCredentialContract,
 ) (*pb.UserResponse, error) {
-	user, failure := server.database.FindUserByEmail(credentials.Email)
+	user, failure := server.storage.FindUserByEmail(credentials.Email)
 	if user != nil || failure == nil {
 		return nil, failures.Network{}.NewBadRequest("email is already registered")
 	}
 
 	user = &models.User{Email: credentials.Email, Password: credentials.Password}
-	failure = server.database.CreateUser(user)
+	failure = server.storage.CreateUser(user)
 	if failure != nil {
 		return nil, failure
 	}
@@ -62,7 +62,7 @@ func (server *grpcServer) CreateUser(_ context.Context, credentials *pb.UserCred
 
 func (server *grpcServer) GetUser(_ context.Context, credentials *pb.UserCredentialContract,
 ) (*pb.UserResponse, error) {
-	user, failure := server.database.FindUserByEmailAndPassword(credentials.Email, credentials.Password)
+	user, failure := server.storage.FindUserByEmailAndPassword(credentials.Email, credentials.Password)
 	if failure != nil {
 		return nil, failure
 	}

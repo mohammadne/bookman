@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/labstack/echo/v4"
-	"github.com/mohammadne/bookman/user/internal/database"
 	"github.com/mohammadne/bookman/user/internal/network/grpc"
+	"github.com/mohammadne/bookman/user/internal/storage"
 	"github.com/mohammadne/bookman/user/pkg/logger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -14,15 +14,15 @@ type restEcho struct {
 	// injected parameters
 	config   *Config
 	logger   logger.Logger
-	database database.Database
+	storage  storage.Storage
 	authGrpc grpc.AuthClient
 
 	// internal dependencies
 	echo *echo.Echo
 }
 
-func New(cfg *Config, log logger.Logger, db database.Database, ac grpc.AuthClient) *restEcho {
-	handler := &restEcho{config: cfg, logger: log, database: db, authGrpc: ac}
+func New(cfg *Config, log logger.Logger, s storage.Storage, ac grpc.AuthClient) *restEcho {
+	handler := &restEcho{config: cfg, logger: log, storage: s, authGrpc: ac}
 
 	handler.echo = echo.New()
 	handler.echo.HideBanner = true

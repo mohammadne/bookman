@@ -36,15 +36,15 @@ func (rest *restEcho) searchUsers(ctx echo.Context) error {
 
 func (rest *restEcho) getUserByIdString(idStr string) (*models.User, failures.Failure) {
 	if idStr == "" {
-		return nil, failures.Rest{}.NewBadRequest("invalid id is given")
+		return nil, failures.Network{}.NewBadRequest("invalid id is given")
 	}
 
 	id, parseErr := strconv.ParseInt(idStr, 10, 64)
 	if parseErr != nil {
-		return nil, failures.Rest{}.NewBadRequest("given user id is malformed")
+		return nil, failures.Network{}.NewBadRequest("given user id is malformed")
 	}
 
-	user, failure := rest.database.FindUserById(id)
+	user, failure := rest.storage.FindUserById(id)
 	if failure != nil {
 		return nil, failure
 	}
