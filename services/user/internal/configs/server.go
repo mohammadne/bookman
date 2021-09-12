@@ -60,11 +60,11 @@ func (config *server) loadDev() {
 
 	config.Tracer = &tracer.Config{
 		Enabled:    false,
-		Host:       "",
+		Host:       "localhost",
 		Port:       "",
 		SampleRate: 0,
 		Namespace:  "bookman",
-		Subsystem:  "library",
+		Subsystem:  "user",
 	}
 
 	config.Database = &database.Config{
