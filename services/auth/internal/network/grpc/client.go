@@ -27,7 +27,7 @@ type userClient struct {
 	api    pb.UserClient
 }
 
-func NewUserClient(cfg *Config, lg logger.Logger, tracer trace.Tracer) (*userClient, failures.Failure) {
+func NewUserClient(cfg *Config, lg logger.Logger, tracer trace.Tracer) (*userClient, error) {
 	client := &userClient{logger: lg, tracer: tracer}
 
 	Address := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
@@ -41,24 +41,52 @@ func NewUserClient(cfg *Config, lg logger.Logger, tracer trace.Tracer) (*userCli
 }
 
 func (client *userClient) CreateUser(ctx context.Context, user *models.UserCredential) (uint64, failures.Failure) {
-	ctr := &pb.UserCredentialContract{Email: user.Email, Password: user.Password}
-	response, err := client.api.CreateUser(ctx, ctr)
+	ctx, span := client.tracer.Start(ctx, "network.grpc.client.user.create_user")
+	defer span.End()
 
-	if err != nil {
-		client.logger.Error("error grpc create user", logger.Error(err))
-		return 0, err
+	ctr := &pb.UserCredentialContract{Email: user.Email, Password: user.Password}
+	operation := func() (*pb.UserResponse, error) {
+		return client.api.CreateUser(ctx, ctr)
 	}
 
-	return uint64(response.Id), nil
+	id, failure := client.operate(operation)
+	if failure != nil {
+		client.logger.Error(failure.Message(), logger.Error(failure))
+		span.RecordError(failure)
+		return 0, failure
+	}
+
+	return id, nil
 }
 
 func (client *userClient) GetUser(ctx context.Context, user *models.UserCredential) (uint64, failures.Failure) {
+	ctx, span := client.tracer.Start(ctx, "network.grpc.client.user.get_user")
+	defer span.End()
+
 	ctr := &pb.UserCredentialContract{Email: user.Email, Password: user.Password}
-	response, err := client.api.GetUser(ctx, ctr)
+	operation := func() (*pb.UserResponse, error) {
+		return client.api.GetUser(ctx, ctr)
+	}
+
+	id, failure := client.operate(operation)
+	if failure != nil {
+		client.logger.Error(failure.Message(), logger.Error(failure))
+		span.RecordError(failure)
+		return 0, failure
+	}
+
+	return id, nil
+}
+
+func (client *userClient) operate(operation func() (*pb.UserResponse, error)) (uint64, failures.Failure) {
+	response, err := operation()
 
 	if err != nil {
-		client.logger.Error("error grpc get user", logger.Error(err))
-		return 0, err
+		return 0, failures.Network{}.NewInternalServer(err.Error())
+	}
+
+	if response.Id == 0 {
+		return 0, failures.Network{}.NewBadRequest("invalid user response")
 	}
 
 	return uint64(response.Id), nil
