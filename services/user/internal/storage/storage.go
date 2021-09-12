@@ -6,6 +6,8 @@ import (
 	"github.com/mohammadne/bookman/user/internal/models"
 	"github.com/mohammadne/bookman/user/pkg/database"
 	"github.com/mohammadne/bookman/user/pkg/failures"
+	"github.com/mohammadne/bookman/user/pkg/logger"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Storage interface {
@@ -18,9 +20,11 @@ type Storage interface {
 }
 
 type storage struct {
+	logger   logger.Logger
+	tracer   trace.Tracer
 	database database.Database
 }
 
-func NewStorage(db database.Database) Storage {
-	return &storage{database: db}
+func NewStorage(lg logger.Logger, tr trace.Tracer, db database.Database) Storage {
+	return &storage{logger: lg, tracer: tr, database: db}
 }
