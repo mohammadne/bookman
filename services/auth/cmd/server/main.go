@@ -1,10 +1,8 @@
 package server
 
 import (
-	"fmt"
-
-	"github.com/mohammadne/bookman/auth/config"
 	"github.com/mohammadne/bookman/auth/internal/cache"
+	"github.com/mohammadne/bookman/auth/internal/configs"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
 	"github.com/mohammadne/bookman/auth/internal/network"
 	"github.com/mohammadne/bookman/auth/internal/network/grpc"
@@ -17,50 +15,38 @@ import (
 const (
 	use   = "server"
 	short = "run server"
-
-	// server-cmd flags usage
-	envUsage = "setting environment, default is dev"
 )
 
 func Command() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   use,
-		Short: short,
-		Run: func(cmd *cobra.Command, args []string) {
-			env, err := cmd.Flags().GetString("env")
-			if err != nil {
-				fmt.Println(err)
-			}
+	cmd := &cobra.Command{Use: use, Short: short, Run: main}
 
-			main(config.EnvFromFlag(env))
-		},
-	}
-
-	// set server-cmd flags
-	cmd.Flags().StringP("env", "e", "", envUsage)
+	envFlag := "set config environment, default is dev"
+	cmd.Flags().StringP("env", "e", "", envFlag)
 
 	return cmd
 }
 
-func main(environment config.Environment) {
+func main(cmd *cobra.Command, args []string) {
+	env := cmd.Flag("env").Value.String()
+	config := configs.Server(env)
+
 	// done channel is a trick to pause main groutine
 	done := make(chan struct{})
 
-	//
-	cfg := config.Load(environment)
-	log := logger.NewZap(cfg.Logger)
-	cache := cache.NewRedis(cfg.Cache, log)
+	lg := logger.NewZap(config.Logger)
+
+	cache := cache.NewRedis(config.Cache, lg)
 
 	//
-	jwt := jwt.New(cfg.Jwt, log)
+	jwt := jwt.New(config.Jwt, lg)
 
-	userGrpc := grpc_client.NewUser(cfg.GrpcUser, log)
+	userGrpc := grpc_client.NewUser(config.UserGrpc, lg)
 	userGrpc.Setup()
 
 	// serving application servers
 	servers := []network.Server{
-		rest_api.New(cfg.Rest, log, cache, jwt, userGrpc),
-		grpc.NewServer(cfg.GrpcServer, log, cache, jwt),
+		rest_api.New(config.RestApi, lg, cache, jwt, userGrpc),
+		grpc.NewServer(config.AuthGrpc, lg, cache, jwt),
 	}
 
 	for _, server := range servers {
