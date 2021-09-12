@@ -9,7 +9,7 @@ import (
 	"github.com/mohammadne/bookman/auth/internal/network"
 	"github.com/mohammadne/bookman/auth/internal/network/grpc"
 	grpc_client "github.com/mohammadne/bookman/auth/internal/network/grpc/clients"
-	"github.com/mohammadne/bookman/auth/internal/network/rest"
+	"github.com/mohammadne/bookman/auth/internal/network/rest_api"
 	"github.com/mohammadne/bookman/auth/pkg/logger"
 	"github.com/spf13/cobra"
 )
@@ -59,7 +59,7 @@ func main(environment config.Environment) {
 
 	// serving application servers
 	servers := []network.Server{
-		rest.New(cfg.Rest, log, cache, jwt, userGrpc),
+		rest_api.New(cfg.Rest, log, cache, jwt, userGrpc),
 		grpc.NewServer(cfg.GrpcServer, log, cache, jwt),
 	}
 

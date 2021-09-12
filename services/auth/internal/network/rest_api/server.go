@@ -1,4 +1,4 @@
-package rest
+package rest_api
 
 import (
 	"github.com/labstack/echo/v4"

@@ -6,7 +6,7 @@ import (
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
 	"github.com/mohammadne/bookman/auth/internal/network/grpc"
-	"github.com/mohammadne/bookman/auth/internal/network/rest"
+	"github.com/mohammadne/bookman/auth/internal/network/rest_api"
 	"github.com/mohammadne/bookman/auth/pkg/logger"
 )
 
@@ -24,7 +24,7 @@ func Load(env Environment) *Config {
 	cfg.Logger = &logger.Config{}
 	cfg.Jwt = &jwt.Config{}
 	cfg.Cache = &cache.Config{}
-	cfg.Rest = &rest.Config{}
+	cfg.Rest = &rest_api.Config{}
 	cfg.GrpcServer = &grpc.Config{}
 	cfg.GrpcUser = &grpc.Config{}
 
