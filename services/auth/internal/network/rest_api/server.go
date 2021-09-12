@@ -8,7 +8,7 @@ import (
 	"github.com/mohammadne/bookman/auth/internal/jwt"
 	"github.com/mohammadne/bookman/auth/internal/network"
 	"github.com/mohammadne/bookman/auth/internal/network/grpc"
-	"github.com/mohammadne/go-pkgs/logger"
+	"github.com/mohammadne/bookman/auth/pkg/logger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel/trace"
 )

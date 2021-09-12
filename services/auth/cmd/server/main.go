@@ -6,9 +6,9 @@ import (
 	"github.com/mohammadne/bookman/auth/internal/jwt"
 	"github.com/mohammadne/bookman/auth/internal/network"
 	"github.com/mohammadne/bookman/auth/internal/network/grpc"
-	grpc_client "github.com/mohammadne/bookman/auth/internal/network/grpc/clients"
 	"github.com/mohammadne/bookman/auth/internal/network/rest_api"
 	"github.com/mohammadne/bookman/auth/pkg/logger"
+	"github.com/mohammadne/bookman/auth/pkg/tracer"
 	"github.com/spf13/cobra"
 )
 
@@ -34,19 +34,24 @@ func main(cmd *cobra.Command, args []string) {
 	done := make(chan struct{})
 
 	lg := logger.NewZap(config.Logger)
+	tracer, err := tracer.New(config.Tracer)
+	if err != nil {
+		lg.Panic("error getting tracer object", logger.Error(err))
+	}
 
 	cache := cache.NewRedis(config.Cache, lg)
 
-	//
 	jwt := jwt.New(config.Jwt, lg)
 
-	userGrpc := grpc_client.NewUser(config.UserGrpc, lg)
-	userGrpc.Setup()
+	userGrpc, err := grpc.NewUserClient(config.UserGrpc, lg, tracer)
+	if err != nil {
+		lg.Panic("error getting auth grpc connection", logger.Error(err))
+	}
 
 	// serving application servers
 	servers := []network.Server{
-		rest_api.New(config.RestApi, lg, cache, jwt, userGrpc),
-		grpc.NewServer(config.AuthGrpc, lg, cache, jwt),
+		rest_api.New(config.RestApi, lg, tracer, cache, jwt, userGrpc),
+		grpc.NewServer(config.AuthGrpc, lg, tracer, cache, jwt),
 	}
 
 	for _, server := range servers {

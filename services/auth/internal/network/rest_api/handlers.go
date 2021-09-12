@@ -8,15 +8,15 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
 	"github.com/mohammadne/bookman/auth/internal/models"
-	"github.com/mohammadne/go-pkgs/failures"
+	"github.com/mohammadne/bookman/auth/pkg/failures"
 )
 
 var (
-	failureInvalidBody         = failures.Rest{}.NewBadRequest("invalid json body provided")
-	failureBadRequest          = failures.Rest{}.NewBadRequest("email is already registered")
-	failureNotFound            = failures.Rest{}.NewNotFound("invalid email and password credentials given")
-	failureUnautorized         = failures.Rest{}.NewUnauthorized("unauthorized")
-	failureUnprocessableEntity = failures.Rest{}.NewUnprocessableEntity("unprocessable entity")
+	failureInvalidBody         = failures.Network{}.NewBadRequest("invalid json body provided")
+	failureBadRequest          = failures.Network{}.NewBadRequest("email is already registered")
+	failureNotFound            = failures.Network{}.NewNotFound("invalid email and password credentials given")
+	failureUnautorized         = failures.Network{}.NewUnauthorized("unauthorized")
+	failureUnprocessableEntity = failures.Network{}.NewUnprocessableEntity("unprocessable entity")
 )
 
 func (r restServer) signUp(ctx echo.Context) error {

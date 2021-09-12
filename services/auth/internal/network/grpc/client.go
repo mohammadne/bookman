@@ -26,7 +26,7 @@ type userClient struct {
 	api    pb.UserClient
 }
 
-func NewUser(cfg *Config, lg logger.Logger, tracer trace.Tracer) (*userClient, error) {
+func NewUserClient(cfg *Config, lg logger.Logger, tracer trace.Tracer) (*userClient, error) {
 	client := &userClient{logger: lg, tracer: tracer}
 
 	Address := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)

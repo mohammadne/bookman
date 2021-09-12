@@ -2,7 +2,7 @@ package cache
 
 import (
 	"github.com/mohammadne/bookman/auth/internal/models"
-	"github.com/mohammadne/go-pkgs/failures"
+	"github.com/mohammadne/bookman/auth/pkg/failures"
 )
 
 type Cache interface {

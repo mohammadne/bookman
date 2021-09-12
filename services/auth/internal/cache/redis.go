@@ -7,8 +7,8 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/mohammadne/bookman/auth/internal/models"
-	"github.com/mohammadne/go-pkgs/failures"
-	"github.com/mohammadne/go-pkgs/logger"
+	"github.com/mohammadne/bookman/auth/pkg/failures"
+	"github.com/mohammadne/bookman/auth/pkg/logger"
 )
 
 const (

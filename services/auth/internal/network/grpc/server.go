@@ -9,7 +9,8 @@ import (
 	"github.com/mohammadne/bookman/auth/internal/jwt"
 	"github.com/mohammadne/bookman/auth/internal/models/pb"
 	"github.com/mohammadne/bookman/auth/internal/network"
-	"github.com/mohammadne/go-pkgs/logger"
+	"github.com/mohammadne/bookman/auth/pkg/logger"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 )
 
@@ -17,6 +18,7 @@ type grpcServer struct {
 	// injected parameters
 	config *Config
 	logger logger.Logger
+	tracer trace.Tracer
 	cache  cache.Cache
 	jwt    jwt.Jwt
 
@@ -25,8 +27,8 @@ type grpcServer struct {
 	pb.UnimplementedAuthServer
 }
 
-func NewServer(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) network.Server {
-	s := &grpcServer{config: cfg, logger: log, cache: c, jwt: j}
+func NewServer(cfg *Config, lg logger.Logger, t trace.Tracer, c cache.Cache, j jwt.Jwt) network.Server {
+	s := &grpcServer{config: cfg, logger: lg, tracer: t, cache: c, jwt: j}
 
 	s.server = grpc.NewServer()
 	pb.RegisterAuthServer(s.server, s)

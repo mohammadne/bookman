@@ -8,7 +8,7 @@ import (
 
 	jwtPkg "github.com/golang-jwt/jwt"
 	"github.com/mohammadne/bookman/auth/internal/models"
-	"github.com/mohammadne/go-pkgs/logger"
+	"github.com/mohammadne/bookman/auth/pkg/logger"
 	uuid "github.com/satori/go.uuid"
 )
 
