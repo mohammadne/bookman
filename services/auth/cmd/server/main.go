@@ -30,9 +30,6 @@ func main(cmd *cobra.Command, args []string) {
 	env := cmd.Flag("env").Value.String()
 	config := configs.Server(env)
 
-	// done channel is a trick to pause main groutine
-	done := make(chan struct{})
-
 	lg := logger.NewZap(config.Logger)
 	tracer, err := tracer.New(config.Tracer)
 	if err != nil {
@@ -40,24 +37,18 @@ func main(cmd *cobra.Command, args []string) {
 	}
 
 	cache := cache.NewRedis(config.Cache, lg)
-
 	jwt := jwt.New(config.Jwt, lg)
-
 	userGrpc, err := grpc.NewUserClient(config.UserGrpc, lg, tracer)
 	if err != nil {
 		lg.Panic("error getting auth grpc connection", logger.Error(err))
 	}
 
-	// serving application servers
 	servers := []network.Server{
 		rest_api.New(config.RestApi, lg, tracer, cache, jwt, userGrpc),
 		grpc.NewServer(config.AuthGrpc, lg, tracer, cache, jwt),
 	}
 
 	for _, server := range servers {
-		go server.Serve(done)
+		go server.Serve(nil)
 	}
-
-	// pause main groutine
-	<-done
 }

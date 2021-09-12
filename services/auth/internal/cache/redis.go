@@ -9,6 +9,7 @@ import (
 	"github.com/mohammadne/bookman/auth/internal/models"
 	"github.com/mohammadne/bookman/auth/pkg/failures"
 	"github.com/mohammadne/bookman/auth/pkg/logger"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const (
@@ -24,18 +25,16 @@ var (
 	failureRevoke     = failures.Database{}.NewInternalServer("error revoking value from database")
 )
 
-func NewRedis(cfg *Config, l logger.Logger) Cache {
-	rc := &redisCache{config: cfg, logger: l}
+func NewRedis(cfg *Config, lg logger.Logger, tr trace.Tracer) Cache {
+	rc := &redisCache{logger: lg, tracer: tr}
 
-	rc.context = context.TODO()
-
-	if rc.config.Mode == cluster {
-		rc.instance = rc.newClusterRedis()
+	if cfg.Mode == cluster {
+		rc.cmd = newClusterRedis(cfg)
 	} else {
-		rc.instance = rc.newSingleRedis()
+		rc.cmd = newSingleRedis(cfg)
 	}
 
-	if err := rc.instance.Ping(rc.context).Err(); err != nil {
+	if err := rc.cmd.Ping(context.TODO()).Err(); err != nil {
 		rc.logger.Fatal(
 			"error to ping redis in initialization",
 			logger.String("err:", err.Error()),
@@ -46,17 +45,15 @@ func NewRedis(cfg *Config, l logger.Logger) Cache {
 }
 
 type redisCache struct {
-	// passed dependencies
-	config *Config
 	logger logger.Logger
+	tracer trace.Tracer
 
 	// internal dependencies
-	context  context.Context
-	instance redis.Cmdable
+	cmd redis.Cmdable
 }
 
-func (rc *redisCache) IsHealthy() failures.Failure {
-	err := rc.instance.Ping(rc.context).Err()
+func (rc *redisCache) IsHealthy(ctx context.Context) failures.Failure {
+	err := rc.cmd.Ping(ctx).Err()
 	if err != nil {
 		rc.logger.Error("redis is not health", logger.Error(err))
 		return failureNotHealthy
@@ -65,23 +62,23 @@ func (rc *redisCache) IsHealthy() failures.Failure {
 	return nil
 }
 
-func (rc *redisCache) SetJwt(userId uint64, td *models.Jwt) failures.Failure {
-	if errAccess := rc.setToken(userId, td.AccessToken); errAccess != nil {
+func (rc *redisCache) SetJwt(ctx context.Context, userId uint64, td *models.Jwt) failures.Failure {
+	if errAccess := rc.setToken(ctx, userId, td.AccessToken); errAccess != nil {
 		return failureSet
 	}
 
-	if errRefresh := rc.setToken(userId, td.RefreshToken); errRefresh != nil {
+	if errRefresh := rc.setToken(ctx, userId, td.RefreshToken); errRefresh != nil {
 		return failureSet
 	}
 
 	return nil
 }
 
-func (rc *redisCache) setToken(userId uint64, token *models.Token) failures.Failure {
+func (rc *redisCache) setToken(ctx context.Context, userId uint64, token *models.Token) failures.Failure {
 	value := strconv.Itoa(int(userId))
 	expire := time.Unix(token.Expires, 0).Sub(time.Now())
 
-	err := rc.instance.Set(rc.context, token.UUID, value, expire).Err()
+	err := rc.cmd.Set(ctx, token.UUID, value, expire).Err()
 	if err != nil {
 		rc.logger.Error("error setting token into redis", logger.Error(err))
 		return failureSet
@@ -90,8 +87,8 @@ func (rc *redisCache) setToken(userId uint64, token *models.Token) failures.Fail
 	return nil
 }
 
-func (rc *redisCache) GetUserId(ad *models.AccessDetails) (uint64, failures.Failure) {
-	userid, err := rc.instance.Get(rc.context, ad.TokenUuid).Result()
+func (rc *redisCache) GetUserId(ctx context.Context, ad *models.AccessDetails) (uint64, failures.Failure) {
+	userid, err := rc.cmd.Get(ctx, ad.TokenUuid).Result()
 	if err != nil {
 		if err == redis.Nil {
 			return 0, failureNotFound
@@ -105,8 +102,8 @@ func (rc *redisCache) GetUserId(ad *models.AccessDetails) (uint64, failures.Fail
 	return userID, nil
 }
 
-func (rc *redisCache) RevokeJwt(uuid string) (int64, failures.Failure) {
-	deleted, err := rc.instance.Del(rc.context, uuid).Result()
+func (rc *redisCache) RevokeJwt(ctx context.Context, uuid string) (int64, failures.Failure) {
+	deleted, err := rc.cmd.Del(ctx, uuid).Result()
 	if err != nil {
 		rc.logger.Error("error revoking from redis", logger.Error(err))
 		return 0, failureRevoke
@@ -116,33 +113,33 @@ func (rc *redisCache) RevokeJwt(uuid string) (int64, failures.Failure) {
 }
 
 // newSingleRedis returns a new `RedisHandler` with a single Redis client.
-func (rc *redisCache) newSingleRedis() *redis.Client {
+func newSingleRedis(cfg *Config) *redis.Client {
 	return redis.NewClient(&redis.Options{
-		Addr:               rc.config.URL,
-		Password:           rc.config.Password,
-		MaxRetries:         rc.config.MaxRetries,
-		MinRetryBackoff:    rc.config.MinRetryBackoff,
-		MaxRetryBackoff:    rc.config.MaxRetryBackoff,
-		ReadTimeout:        rc.config.ReadTimeout,
-		PoolSize:           rc.config.PoolSize,
-		PoolTimeout:        rc.config.PoolTimeout,
-		IdleTimeout:        rc.config.IdleTimeout,
-		IdleCheckFrequency: rc.config.IdleCheckFrequency,
+		Addr:               cfg.URL,
+		Password:           cfg.Password,
+		MaxRetries:         cfg.MaxRetries,
+		MinRetryBackoff:    cfg.MinRetryBackoff,
+		MaxRetryBackoff:    cfg.MaxRetryBackoff,
+		ReadTimeout:        cfg.ReadTimeout,
+		PoolSize:           cfg.PoolSize,
+		PoolTimeout:        cfg.PoolTimeout,
+		IdleTimeout:        cfg.IdleTimeout,
+		IdleCheckFrequency: cfg.IdleCheckFrequency,
 	})
 }
 
 // newClusterRedis returns a new `RedisHandler` with a clustered Redis client.
-func (rc *redisCache) newClusterRedis() *redis.ClusterClient {
+func newClusterRedis(cfg *Config) *redis.ClusterClient {
 	return redis.NewClusterClient(&redis.ClusterOptions{
-		Addrs:              []string{rc.config.MasterURL, rc.config.SlaveURL},
-		Password:           rc.config.Password,
-		MaxRetries:         rc.config.MaxRetries,
-		MinRetryBackoff:    rc.config.MinRetryBackoff,
-		MaxRetryBackoff:    rc.config.MaxRetryBackoff,
-		ReadTimeout:        rc.config.ReadTimeout,
-		PoolSize:           rc.config.PoolSize,
-		PoolTimeout:        rc.config.PoolTimeout,
-		IdleTimeout:        rc.config.IdleTimeout,
-		IdleCheckFrequency: rc.config.IdleCheckFrequency,
+		Addrs:              []string{cfg.MasterURL, cfg.SlaveURL},
+		Password:           cfg.Password,
+		MaxRetries:         cfg.MaxRetries,
+		MinRetryBackoff:    cfg.MinRetryBackoff,
+		MaxRetryBackoff:    cfg.MaxRetryBackoff,
+		ReadTimeout:        cfg.ReadTimeout,
+		PoolSize:           cfg.PoolSize,
+		PoolTimeout:        cfg.PoolTimeout,
+		IdleTimeout:        cfg.IdleTimeout,
+		IdleCheckFrequency: cfg.IdleCheckFrequency,
 	})
 }
