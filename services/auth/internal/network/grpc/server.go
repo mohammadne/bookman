@@ -53,7 +53,7 @@ func (s *grpcServer) TokenMetadata(ctx context.Context, token *pb.TokenContract,
 		return nil, err
 	}
 
-	userId, err := s.cache.GetUserId(accessDetails)
+	userId, err := s.cache.GetUserId(ctx, accessDetails)
 	if err != nil {
 		return nil, err
 	}

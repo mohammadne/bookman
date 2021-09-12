@@ -11,13 +11,14 @@ import (
 	// "github.com/mohammadne/bookman/auth/internal/network/grpc/contracts"
 
 	// "github.com/mohammadne/bookman/auth/internal/network/grpc"
+	"github.com/mohammadne/bookman/auth/pkg/failures"
 	"github.com/mohammadne/bookman/auth/pkg/logger"
 	grpcPkg "google.golang.org/grpc"
 )
 
 type UserClient interface {
-	CreateUser(*models.UserCredential) (uint64, error)
-	GetUser(*models.UserCredential) (uint64, error)
+	CreateUser(context.Context, *models.UserCredential) (uint64, failures.Failure)
+	GetUser(context.Context, *models.UserCredential) (uint64, failures.Failure)
 }
 
 type userClient struct {
@@ -26,7 +27,7 @@ type userClient struct {
 	api    pb.UserClient
 }
 
-func NewUserClient(cfg *Config, lg logger.Logger, tracer trace.Tracer) (*userClient, error) {
+func NewUserClient(cfg *Config, lg logger.Logger, tracer trace.Tracer) (*userClient, failures.Failure) {
 	client := &userClient{logger: lg, tracer: tracer}
 
 	Address := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
@@ -39,11 +40,9 @@ func NewUserClient(cfg *Config, lg logger.Logger, tracer trace.Tracer) (*userCli
 	return client, nil
 }
 
-func (client *userClient) CreateUser(user *models.UserCredential) (uint64, error) {
-	response, err := client.api.CreateUser(
-		context.Background(),
-		&pb.UserCredentialContract{Email: user.Email, Password: user.Password},
-	)
+func (client *userClient) CreateUser(ctx context.Context, user *models.UserCredential) (uint64, failures.Failure) {
+	ctr := &pb.UserCredentialContract{Email: user.Email, Password: user.Password}
+	response, err := client.api.CreateUser(ctx, ctr)
 
 	if err != nil {
 		client.logger.Error("error grpc create user", logger.Error(err))
@@ -53,11 +52,9 @@ func (client *userClient) CreateUser(user *models.UserCredential) (uint64, error
 	return uint64(response.Id), nil
 }
 
-func (client *userClient) GetUser(user *models.UserCredential) (uint64, error) {
-	response, err := client.api.GetUser(
-		context.Background(),
-		&pb.UserCredentialContract{Email: user.Email, Password: user.Password},
-	)
+func (client *userClient) GetUser(ctx context.Context, user *models.UserCredential) (uint64, failures.Failure) {
+	ctr := &pb.UserCredentialContract{Email: user.Email, Password: user.Password}
+	response, err := client.api.GetUser(ctx, ctr)
 
 	if err != nil {
 		client.logger.Error("error grpc get user", logger.Error(err))

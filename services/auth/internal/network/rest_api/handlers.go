@@ -1,7 +1,7 @@
 package rest_api
 
 import (
-	"fmt"
+	"context"
 	"net/http"
 	"strings"
 
@@ -19,96 +19,123 @@ var (
 	failureUnprocessableEntity = failures.Network{}.NewUnprocessableEntity("unprocessable entity")
 )
 
-func (r restServer) signUp(ctx echo.Context) error {
+func (handler restServer) signUp(c echo.Context) error {
+	spanName := "network.rest_api.handlers.sign_up"
+	ctx, span := handler.tracer.Start(c.Request().Context(), spanName)
+	defer span.End()
+
 	userCredential := new(models.UserCredential)
-	if err := ctx.Bind(userCredential); err != nil {
-		return ctx.JSON(failureInvalidBody.Status(), failureInvalidBody)
+	if err := c.Bind(userCredential); err != nil {
+		span.RecordError(failureInvalidBody)
+		return c.JSON(failureInvalidBody.Status(), failureInvalidBody)
 	}
 
-	userId, err := r.userGrpc.CreateUser(userCredential)
-	if err != nil || userId == 0 {
-		return ctx.JSON(failureBadRequest.Status(), failureBadRequest)
+	userId, failure := handler.userGrpc.CreateUser(ctx, userCredential)
+	if failure != nil || userId == 0 {
+		span.RecordError(failure)
+		return c.JSON(failure.Status(), failure)
 	}
 
-	tokens, failure := r.generateTokens(userId)
+	tokens, failure := handler.generateTokens(ctx, userId)
 	if failure != nil {
-		return ctx.JSON(failure.Status(), failure)
+		span.RecordError(failure)
+		return c.JSON(failure.Status(), failure)
 	}
 
-	return ctx.JSON(http.StatusOK, tokens)
+	return c.JSON(http.StatusOK, tokens)
 }
 
-func (r restServer) signIn(ctx echo.Context) error {
+func (handler restServer) signIn(c echo.Context) error {
+	spanName := "network.rest_api.handlers.sign_in"
+	ctx, span := handler.tracer.Start(c.Request().Context(), spanName)
+	defer span.End()
+
 	userCredential := new(models.UserCredential)
-	if err := ctx.Bind(userCredential); err != nil {
-		return ctx.JSON(failureInvalidBody.Status(), failureInvalidBody)
+	if err := c.Bind(userCredential); err != nil {
+		span.RecordError(failureInvalidBody)
+		return c.JSON(failureInvalidBody.Status(), failureInvalidBody)
 	}
 
-	userId, err := r.userGrpc.GetUser(userCredential)
-	if err != nil || userId == 0 {
-		return ctx.JSON(failureNotFound.Status(), failureNotFound)
+	userId, failure := handler.userGrpc.GetUser(ctx, userCredential)
+	if failure != nil || userId == 0 {
+		span.RecordError(failure)
+		return c.JSON(failure.Status(), failure)
 	}
 
-	tokens, failure := r.generateTokens(userId)
+	tokens, failure := handler.generateTokens(ctx, userId)
 	if failure != nil {
-		return ctx.JSON(failure.Status(), failure)
+		span.RecordError(failure)
+		return c.JSON(failure.Status(), failure)
 	}
 
-	return ctx.JSON(http.StatusOK, tokens)
+	return c.JSON(http.StatusOK, tokens)
 }
 
-func (r restServer) signOut(ctx echo.Context) error {
-	tokenString := extractToken(ctx.Request())
-	accessDetails, err := r.jwt.ExtractTokenMetadata(tokenString, jwt.Access)
-	if err != nil {
-		return ctx.JSON(failureUnautorized.Status(), failureUnautorized)
+func (handler restServer) signOut(c echo.Context) error {
+	spanName := "network.rest_api.handlers.sign_out"
+	ctx, span := handler.tracer.Start(c.Request().Context(), spanName)
+	defer span.End()
+
+	tokenString := extractToken(c.Request())
+	accessDetails, failure := handler.jwt.ExtractTokenMetadata(tokenString, jwt.Access)
+	if failure != nil {
+		span.RecordError(failure)
+		return c.JSON(failure.Status(), failure)
 	}
 
-	deleted, delErr := r.cache.RevokeJwt(accessDetails.TokenUuid)
-	if delErr != nil || deleted == 0 {
-		return ctx.JSON(failureUnautorized.Status(), failureUnautorized)
+	deleted, failure := handler.cache.RevokeJwt(ctx, accessDetails.TokenUuid)
+	if failure != nil || deleted == 0 {
+		span.RecordError(failure)
+		return c.JSON(failure.Status(), failure)
 	}
 
-	return ctx.JSON(http.StatusOK, "Successfully logged out")
+	return c.JSON(http.StatusOK, "Successfully logged out")
 }
 
-func (r restServer) refreshToken(ctx echo.Context) error {
+func (handler restServer) refreshToken(c echo.Context) error {
+	spanName := "network.rest_api.handlers.refresh_token"
+	ctx, span := handler.tracer.Start(c.Request().Context(), spanName)
+	defer span.End()
+
 	body := struct {
 		RefreshToken string `json:"refresh_token"`
 	}{}
 
-	if err := ctx.Bind(&body); err != nil {
-		fmt.Println(err)
-		return ctx.JSON(failureInvalidBody.Status(), failureInvalidBody)
+	if err := c.Bind(&body); err != nil {
+		span.RecordError(err)
+		return c.JSON(failureInvalidBody.Status(), failureInvalidBody)
 	}
 
-	accessDetails, err := r.jwt.ExtractTokenMetadata(body.RefreshToken, jwt.Refresh)
-	if err != nil {
-		return ctx.JSON(failureUnprocessableEntity.Status(), failureUnprocessableEntity)
-	}
-
-	userId, err := r.cache.RevokeJwt(accessDetails.TokenUuid)
-	if err != nil || userId == 0 {
-		return ctx.JSON(failureUnautorized.Status(), failureUnautorized)
-	}
-
-	tokens, failure := r.generateTokens(accessDetails.UserId)
+	accessDetails, failure := handler.jwt.ExtractTokenMetadata(body.RefreshToken, jwt.Refresh)
 	if failure != nil {
-		return ctx.JSON(failure.Status(), failure)
+		span.RecordError(failure)
+		return c.JSON(failure.Status(), failure)
 	}
 
-	return ctx.JSON(http.StatusOK, tokens)
+	userId, failure := handler.cache.RevokeJwt(ctx, accessDetails.TokenUuid)
+	if failure != nil || userId == 0 {
+		span.RecordError(failure)
+		return c.JSON(failure.Status(), failure)
+	}
+
+	tokens, failure := handler.generateTokens(ctx, accessDetails.UserId)
+	if failure != nil {
+		span.RecordError(failure)
+		return c.JSON(failure.Status(), failure)
+	}
+
+	return c.JSON(http.StatusOK, tokens)
 }
 
-func (r restServer) generateTokens(userId uint64) (map[string]string, failures.Failure) {
-	jwt, err := r.jwt.CreateJwt(userId)
-	if err != nil {
-		return nil, failureUnprocessableEntity
+func (handler restServer) generateTokens(ctx context.Context, userId uint64) (map[string]string, failures.Failure) {
+	jwt, failure := handler.jwt.CreateJwt(userId)
+	if failure != nil {
+		return nil, failure
 	}
 
-	saveErr := r.cache.SetJwt(userId, jwt)
-	if saveErr != nil {
-		return nil, failureUnprocessableEntity
+	failure = handler.cache.SetJwt(ctx, userId, jwt)
+	if failure != nil {
+		return nil, failure
 	}
 
 	return map[string]string{

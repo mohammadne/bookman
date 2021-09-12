@@ -10,20 +10,20 @@ import (
 	"github.com/mohammadne/bookman/user/pkg/logger"
 )
 
-func (rest *restServer) authenticate(next echo.HandlerFunc) echo.HandlerFunc {
+func (middleware *restServer) authenticate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		spanName := "network.rest_api.middlewares.authenticate"
-		ctx, span := rest.tracer.Start(c.Request().Context(), spanName)
+		ctx, span := middleware.tracer.Start(c.Request().Context(), spanName)
 		defer span.End()
 
 		token, failure := extractToken(c.Request())
 		if failure != nil {
 			span.RecordError(failure)
-			rest.logger.Error("invalid token", logger.Error(failure))
+			middleware.logger.Error("invalid token", logger.Error(failure))
 			return c.JSON(failure.Status(), failure)
 		}
 
-		userId, failure := rest.authGrpc.GetTokenMetadata(ctx, token)
+		userId, failure := middleware.authGrpc.GetTokenMetadata(ctx, token)
 		if failure != nil || userId == 0 {
 			span.RecordError(failure)
 			return c.JSON(failure.Status(), failure)

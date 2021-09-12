@@ -8,8 +8,10 @@ import (
 
 	jwtPkg "github.com/golang-jwt/jwt"
 	"github.com/mohammadne/bookman/auth/internal/models"
+	"github.com/mohammadne/bookman/auth/pkg/failures"
 	"github.com/mohammadne/bookman/auth/pkg/logger"
 	uuid "github.com/satori/go.uuid"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type TokenType uint8
@@ -20,21 +22,23 @@ const (
 )
 
 type Jwt interface {
-	CreateJwt(userId uint64) (*models.Jwt, error)
-	ExtractTokenMetadata(tokenString string, tokenType TokenType) (*models.AccessDetails, error)
+	CreateJwt(userId uint64) (*models.Jwt, failures.Failure)
+	ExtractTokenMetadata(tokenString string, tokenType TokenType) (*models.AccessDetails, failures.Failure)
 	TokenValid(tokenString string, tokenType TokenType) error
 }
 
 type jwt struct {
 	config *Config
 	logger logger.Logger
+	tracer trace.Tracer
 }
 
-func New(config *Config, logger logger.Logger) Jwt {
-	return &jwt{config: config, logger: logger}
+func New(cfg *Config, lg logger.Logger, tr trace.Tracer) Jwt {
+	return &jwt{config: cfg, logger: lg, tracer: tr}
 }
 
-func (jwt *jwt) CreateJwt(userId uint64) (*models.Jwt, error) {
+// failureUnprocessableEntity
+func (jwt *jwt) CreateJwt(userId uint64) (*models.Jwt, failures.Failure) {
 	accessExpires := time.Duration(jwt.config.AccessExpires) * time.Hour
 	refreshExpires := time.Duration(jwt.config.RefreshExpires) * time.Hour
 
@@ -80,7 +84,10 @@ func createToken(userId uint64, secret string, token *models.Token) error {
 	return nil
 }
 
-func (jwt *jwt) ExtractTokenMetadata(tokenString string, tokenType TokenType) (*models.AccessDetails, error) {
+// failureUnprocessableEntity
+// 	failureUnautorized         = failures.Network{}.NewUnauthorized("unauthorized")
+// failureUnautorized
+func (jwt *jwt) ExtractTokenMetadata(tokenString string, tokenType TokenType) (*models.AccessDetails, failures.Failure) {
 	token, err := jwt.verifyToken(tokenString, tokenType)
 	if err != nil {
 		return nil, err

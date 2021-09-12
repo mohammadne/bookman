@@ -36,8 +36,8 @@ func main(cmd *cobra.Command, args []string) {
 		lg.Panic("error getting tracer object", logger.Error(err))
 	}
 
-	cache := cache.NewRedis(config.Cache, lg)
-	jwt := jwt.New(config.Jwt, lg)
+	cache := cache.NewRedis(config.Cache, lg, tracer)
+	jwt := jwt.New(config.Jwt, lg, tracer)
 	userGrpc, err := grpc.NewUserClient(config.UserGrpc, lg, tracer)
 	if err != nil {
 		lg.Panic("error getting auth grpc connection", logger.Error(err))

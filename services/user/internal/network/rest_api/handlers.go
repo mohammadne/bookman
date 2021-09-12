@@ -11,12 +11,12 @@ import (
 	"github.com/mohammadne/bookman/user/pkg/logger"
 )
 
-func (rest *restServer) getUser(c echo.Context) error {
+func (handler *restServer) getUser(c echo.Context) error {
 	spanName := "network.rest_api.handlers.get_user"
-	ctx, span := rest.tracer.Start(c.Request().Context(), spanName)
+	ctx, span := handler.tracer.Start(c.Request().Context(), spanName)
 	defer span.End()
 
-	user, failure := rest.getUserByIdString(ctx, c.Param("id"))
+	user, failure := handler.getUserByIdString(ctx, c.Param("id"))
 	if failure != nil {
 		span.RecordError(failure)
 		return c.JSON(failure.Status(), failure)
@@ -25,14 +25,14 @@ func (rest *restServer) getUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, user.Marshall(true))
 }
 
-func (rest *restServer) getMyUser(c echo.Context) error {
+func (handler *restServer) getMyUser(c echo.Context) error {
 	spanName := "network.rest_api.handlers.get_my_user"
-	ctx, span := rest.tracer.Start(c.Request().Context(), spanName)
+	ctx, span := handler.tracer.Start(c.Request().Context(), spanName)
 	defer span.End()
 
-	user, failure := rest.getUserByIdString(ctx, c.Get("self_token").(string))
+	user, failure := handler.getUserByIdString(ctx, c.Get("self_token").(string))
 	if failure != nil {
-		rest.logger.Error(failure.Message(), logger.Error(failure))
+		handler.logger.Error(failure.Message(), logger.Error(failure))
 		span.RecordError(failure)
 		return c.JSON(failure.Status(), failure)
 	}
@@ -40,7 +40,7 @@ func (rest *restServer) getMyUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, user.Marshall(false))
 }
 
-func (rest *restServer) getUserByIdString(ctx context.Context, idStr string) (*models.User, failures.Failure) {
+func (handler *restServer) getUserByIdString(ctx context.Context, idStr string) (*models.User, failures.Failure) {
 	if idStr == "" {
 		return nil, failures.Network{}.NewBadRequest("invalid id is given")
 	}
@@ -50,7 +50,7 @@ func (rest *restServer) getUserByIdString(ctx context.Context, idStr string) (*m
 		return nil, failures.Network{}.NewBadRequest("given user id is malformed")
 	}
 
-	user, failure := rest.storage.FindUserById(ctx, id)
+	user, failure := handler.storage.FindUserById(ctx, id)
 	if failure != nil {
 		return nil, failure
 	}

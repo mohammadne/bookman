@@ -62,6 +62,7 @@ func (rc *redisCache) IsHealthy(ctx context.Context) failures.Failure {
 	return nil
 }
 
+// failureUnprocessableEntity
 func (rc *redisCache) SetJwt(ctx context.Context, userId uint64, td *models.Jwt) failures.Failure {
 	if errAccess := rc.setToken(ctx, userId, td.AccessToken); errAccess != nil {
 		return failureSet
@@ -102,6 +103,8 @@ func (rc *redisCache) GetUserId(ctx context.Context, ad *models.AccessDetails) (
 	return userID, nil
 }
 
+// failureUnautorized
+// failureUnautorized
 func (rc *redisCache) RevokeJwt(ctx context.Context, uuid string) (int64, failures.Failure) {
 	deleted, err := rc.cmd.Del(ctx, uuid).Result()
 	if err != nil {
