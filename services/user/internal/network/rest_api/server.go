@@ -8,12 +8,14 @@ import (
 	"github.com/mohammadne/bookman/user/internal/storage"
 	"github.com/mohammadne/bookman/user/pkg/logger"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type restEcho struct {
 	// injected parameters
 	config   *Config
 	logger   logger.Logger
+	tracer   trace.Tracer
 	storage  storage.Storage
 	authGrpc grpc.AuthClient
 
@@ -37,7 +39,6 @@ func (rest *restEcho) setupRoutes() {
 	authGroup := rest.echo.Group("/users")
 	authGroup.GET("/:id", rest.getUser, rest.authenticate)
 	authGroup.GET("/me", rest.getMyUser, rest.authenticate)
-	authGroup.GET("/search", rest.searchUsers, rest.authenticate)
 }
 
 func (rest *restEcho) Serve(<-chan struct{}) {

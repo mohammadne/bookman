@@ -1,6 +1,7 @@
 package rest_api
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
@@ -10,41 +11,46 @@ import (
 	"github.com/mohammadne/bookman/user/pkg/logger"
 )
 
-// get is responsible to provide HTTP Get Location functionality
-func (rest *restEcho) getUser(ctx echo.Context) error {
-	user, failure := rest.getUserByIdString(ctx.Param("id"))
+func (rest *restEcho) getUser(c echo.Context) error {
+	spanName := "network.rest_api.handlers.get_user"
+	ctx, span := rest.tracer.Start(c.Request().Context(), spanName)
+	defer span.End()
+
+	user, failure := rest.getUserByIdString(ctx, c.Param("id"))
 	if failure != nil {
-		return ctx.JSON(failure.Status(), failure)
+		span.RecordError(failure)
+		return c.JSON(failure.Status(), failure)
 	}
 
-	return ctx.JSON(http.StatusOK, user.Marshall(true))
+	return c.JSON(http.StatusOK, user.Marshall(true))
 }
 
-func (rest *restEcho) getMyUser(ctx echo.Context) error {
-	user, failure := rest.getUserByIdString(ctx.Get("self_token").(string))
+func (rest *restEcho) getMyUser(c echo.Context) error {
+	spanName := "network.rest_api.handlers.get_my_user"
+	ctx, span := rest.tracer.Start(c.Request().Context(), spanName)
+	defer span.End()
+
+	user, failure := rest.getUserByIdString(ctx, c.Get("self_token").(string))
 	if failure != nil {
 		rest.logger.Error(failure.Message(), logger.Error(failure))
-		return ctx.JSON(failure.Status(), failure)
+		span.RecordError(failure)
+		return c.JSON(failure.Status(), failure)
 	}
 
-	return ctx.JSON(http.StatusOK, user.Marshall(false))
+	return c.JSON(http.StatusOK, user.Marshall(false))
 }
 
-func (rest *restEcho) searchUsers(ctx echo.Context) error {
-	return nil
-}
-
-func (rest *restEcho) getUserByIdString(idStr string) (*models.User, failures.Failure) {
+func (rest *restEcho) getUserByIdString(ctx context.Context, idStr string) (*models.User, failures.Failure) {
 	if idStr == "" {
 		return nil, failures.Network{}.NewBadRequest("invalid id is given")
 	}
 
-	id, parseErr := strconv.ParseInt(idStr, 10, 64)
+	id, parseErr := strconv.ParseUint(idStr, 10, 64)
 	if parseErr != nil {
 		return nil, failures.Network{}.NewBadRequest("given user id is malformed")
 	}
 
-	user, failure := rest.storage.FindUserById(id)
+	user, failure := rest.storage.FindUserById(ctx, id)
 	if failure != nil {
 		return nil, failure
 	}

@@ -12,8 +12,8 @@ import (
 
 func (rest *restApi) authenticate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		ctx := c.Request().Context()
-		ctx, span := rest.tracer.Start(ctx, "network.rest_api.middlewares.authenticate")
+		spanName := "network.rest_api.middlewares.authenticate"
+		ctx, span := rest.tracer.Start(c.Request().Context(), spanName)
 		defer span.End()
 
 		token, failure := extractToken(c.Request())

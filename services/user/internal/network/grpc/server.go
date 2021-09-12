@@ -10,14 +10,15 @@ import (
 	"github.com/mohammadne/bookman/user/internal/storage"
 	"github.com/mohammadne/bookman/user/pkg/failures"
 	"github.com/mohammadne/bookman/user/pkg/logger"
+	"go.opentelemetry.io/otel/trace"
 
 	"google.golang.org/grpc"
 )
 
 type grpcServer struct {
-	// injected parameters
 	config  *Config
 	logger  logger.Logger
+	tracer  trace.Tracer
 	storage storage.Storage
 
 	// internal dependencies
@@ -44,26 +45,36 @@ func (s *grpcServer) Serve(<-chan struct{}) {
 	s.server.Serve(listener)
 }
 
-func (server *grpcServer) CreateUser(_ context.Context, credentials *pb.UserCredentialContract,
+func (server *grpcServer) CreateUser(ctx context.Context, credentials *pb.UserCredentialContract,
 ) (*pb.UserResponse, error) {
-	user, failure := server.storage.FindUserByEmail(credentials.Email)
+	ctx, span := server.tracer.Start(ctx, "network.grpc.server.create_user")
+	defer span.End()
+
+	user, failure := server.storage.FindUserByEmail(ctx, credentials.Email)
 	if user != nil || failure == nil {
-		return nil, failures.Network{}.NewBadRequest("email is already registered")
+		failure := failures.Network{}.NewBadRequest("email is already registered")
+		span.RecordError(failure)
+		return nil, failure
 	}
 
 	user = &models.User{Email: credentials.Email, Password: credentials.Password}
-	failure = server.storage.CreateUser(user)
+	failure = server.storage.CreateUser(ctx, user)
 	if failure != nil {
+		span.RecordError(failure)
 		return nil, failure
 	}
 
 	return &pb.UserResponse{Id: user.Id}, nil
 }
 
-func (server *grpcServer) GetUser(_ context.Context, credentials *pb.UserCredentialContract,
+func (server *grpcServer) GetUser(ctx context.Context, credentials *pb.UserCredentialContract,
 ) (*pb.UserResponse, error) {
-	user, failure := server.storage.FindUserByEmailAndPassword(credentials.Email, credentials.Password)
+	ctx, span := server.tracer.Start(ctx, "network.grpc.server.get_user")
+	defer span.End()
+
+	user, failure := server.storage.FindUserByEmailAndPassword(ctx, credentials.Email, credentials.Password)
 	if failure != nil {
+		span.RecordError(failure)
 		return nil, failure
 	}
 

@@ -11,22 +11,26 @@ import (
 )
 
 func (rest *restEcho) authenticate(next echo.HandlerFunc) echo.HandlerFunc {
-	// span, ctx := rest.tra
+	return func(c echo.Context) error {
+		spanName := "network.rest_api.middlewares.authenticate"
+		ctx, span := rest.tracer.Start(c.Request().Context(), spanName)
+		defer span.End()
 
-	return func(ctx echo.Context) error {
-		token, failure := extractToken(ctx.Request())
+		token, failure := extractToken(c.Request())
 		if failure != nil {
+			span.RecordError(failure)
 			rest.logger.Error("invalid token", logger.Error(failure))
-			return ctx.JSON(failure.Status(), failure)
-		}
-		// TODO : pass context
-		userId, failure := rest.authGrpc.GetTokenMetadata(nil, token)
-		if failure != nil || userId == 0 {
-			return ctx.JSON(failure.Status(), failure)
+			return c.JSON(failure.Status(), failure)
 		}
 
-		ctx.Set("self_token", strconv.FormatUint(userId, 10))
-		return next(ctx)
+		userId, failure := rest.authGrpc.GetTokenMetadata(ctx, token)
+		if failure != nil || userId == 0 {
+			span.RecordError(failure)
+			return c.JSON(failure.Status(), failure)
+		}
+
+		c.Set("self_token", strconv.FormatUint(userId, 10))
+		return next(c)
 	}
 }
 
