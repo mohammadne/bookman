@@ -1,12 +1,12 @@
 package migrate
 
 import (
-	"context"
 	"os"
 
 	"github.com/mohammadne/bookman/library/internal/configs"
 	"github.com/mohammadne/bookman/library/internal/database"
 	"github.com/mohammadne/bookman/library/pkg/logger"
+	"github.com/mohammadne/bookman/library/pkg/tracer"
 	"github.com/spf13/cobra"
 )
 
@@ -32,13 +32,18 @@ func main(cmd *cobra.Command, args []string) {
 	config := configs.Migrate(env)
 
 	lg := logger.NewZap(config.Logger)
-	db, err := database.NewClient(config.Database)
+	tracer, err := tracer.New(config.Tracer)
+	if err != nil {
+		lg.Panic("error getting tracer object", logger.Error(err))
+	}
+
+	db, err := database.NewClient(config.Database, lg, tracer)
 	if err != nil {
 		lg.Panic("", logger.Error(err))
 	}
 
 	lg.Info("following changes will be executed to database")
-	if err := db.MigratePreview(context.TODO(), os.Stdout); err != nil {
+	if err := db.MigratePreview(os.Stdout); err != nil {
 		lg.Panic("error while previewing migration", logger.Error(err))
 	}
 
@@ -48,7 +53,7 @@ func main(cmd *cobra.Command, args []string) {
 	}
 
 	if !preview {
-		if err := db.Migrate(context.TODO()); err != nil {
+		if err := db.Migrate(); err != nil {
 			lg.Panic("error while running migration", logger.Error(err))
 		}
 

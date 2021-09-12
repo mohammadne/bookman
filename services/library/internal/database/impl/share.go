@@ -3,6 +3,7 @@ package database_impl
 import (
 	"github.com/mohammadne/bookman/library/internal/database/ent"
 	"github.com/mohammadne/bookman/library/pkg/failures"
+	"github.com/mohammadne/bookman/library/pkg/logger"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -12,10 +13,11 @@ var (
 )
 
 type database struct {
+	logger logger.Logger
 	tracer trace.Tracer
 	client *ent.Client
 }
 
-func New(client *ent.Client) *database {
-	return &database{}
+func New(lg logger.Logger, tr trace.Tracer, client *ent.Client) *database {
+	return &database{logger: lg, tracer: tr, client: client}
 }

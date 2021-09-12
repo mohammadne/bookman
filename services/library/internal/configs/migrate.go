@@ -4,10 +4,12 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/mohammadne/bookman/library/internal/database"
 	"github.com/mohammadne/bookman/library/pkg/logger"
+	"github.com/mohammadne/bookman/library/pkg/tracer"
 )
 
 type migrate struct {
 	Logger   *logger.Config
+	Tracer   *tracer.Config
 	Database *database.Config
 }
 
@@ -26,11 +28,13 @@ func Migrate(env string) *migrate {
 
 func (config *migrate) loadProd() {
 	config.Logger = &logger.Config{}
+	config.Tracer = &tracer.Config{}
 	config.Database = &database.Config{}
 
 	// process
 	envconfig.MustProcess("library", config)
 	envconfig.MustProcess("library_logger", config.Logger)
+	envconfig.MustProcess("library_tracer", config.Tracer)
 	envconfig.MustProcess("library_database", config.Database)
 }
 
@@ -41,6 +45,15 @@ func (config *migrate) loadDev() {
 		EnableStacktrace: false,
 		Encoding:         "console",
 		Level:            "warn",
+	}
+
+	config.Tracer = &tracer.Config{
+		Enabled:    false,
+		Host:       "localhost",
+		Port:       "",
+		SampleRate: 0,
+		Namespace:  "bookman",
+		Subsystem:  "library",
 	}
 
 	config.Database = &database.Config{

@@ -8,20 +8,22 @@ import (
 )
 
 type Migration interface {
-	MigratePreview(ctx context.Context, writer io.Writer) error
-	Migrate(ctx context.Context) error
+	MigratePreview(writer io.Writer) error
+	Migrate() error
 }
 
-func (db *database) MigratePreview(ctx context.Context, writer io.Writer) error {
-	return db.client.Schema.WriteTo(ctx,
+func (db *database) MigratePreview(writer io.Writer) error {
+	return db.client.Schema.WriteTo(
+		context.TODO(),
 		writer,
 		migrate.WithDropIndex(true),
 		migrate.WithDropColumn(true),
 	)
 }
 
-func (db *database) Migrate(ctx context.Context) error {
-	return db.client.Schema.Create(ctx,
+func (db *database) Migrate() error {
+	return db.client.Schema.Create(
+		context.TODO(),
 		migrate.WithDropIndex(true),
 		migrate.WithDropColumn(true),
 	)

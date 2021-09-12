@@ -34,7 +34,7 @@ func main(cmd *cobra.Command, args []string) {
 		lg.Panic("error getting tracer object", logger.Error(err))
 	}
 
-	db, err := database.NewClient(config.Database)
+	db, err := database.NewClient(config.Database, lg, tracer)
 	if err != nil {
 		lg.Panic("error getting database client", logger.Error(err))
 	}
