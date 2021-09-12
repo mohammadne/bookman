@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strconv"
@@ -22,9 +23,9 @@ const (
 )
 
 type Jwt interface {
-	CreateJwt(userId uint64) (*models.Jwt, failures.Failure)
-	ExtractTokenMetadata(tokenString string, tokenType TokenType) (*models.AccessDetails, failures.Failure)
-	TokenValid(tokenString string, tokenType TokenType) error
+	CreateJwt(context.Context, uint64) (*models.Jwt, failures.Failure)
+	ExtractTokenMetadata(context.Context, string, TokenType) (*models.AccessDetails, failures.Failure)
+	TokenValid(context.Context, string, TokenType) failures.Failure
 }
 
 type jwt struct {
@@ -37,8 +38,10 @@ func New(cfg *Config, lg logger.Logger, tr trace.Tracer) Jwt {
 	return &jwt{config: cfg, logger: lg, tracer: tr}
 }
 
-// failureUnprocessableEntity
-func (jwt *jwt) CreateJwt(userId uint64) (*models.Jwt, failures.Failure) {
+func (jwt *jwt) CreateJwt(ctx context.Context, userId uint64) (*models.Jwt, failures.Failure) {
+	ctx, span := jwt.tracer.Start(ctx, "jwt.create_jwt")
+	defer span.End()
+
 	accessExpires := time.Duration(jwt.config.AccessExpires) * time.Hour
 	refreshExpires := time.Duration(jwt.config.RefreshExpires) * time.Hour
 
@@ -55,12 +58,18 @@ func (jwt *jwt) CreateJwt(userId uint64) (*models.Jwt, failures.Failure) {
 
 	accessErr := createToken(userId, jwt.config.AccessSecret, tokenDetail.AccessToken)
 	if accessErr != nil {
-		return nil, accessErr
+		failure := Failure{}.NewUnprocessableEntity("unprocessable access token")
+		jwt.logger.Error(failure.Message(), logger.Error(accessErr))
+		span.RecordError(accessErr)
+		return nil, failure
 	}
 
 	refreshErr := createToken(userId, jwt.config.RefreshSecret, tokenDetail.RefreshToken)
 	if refreshErr != nil {
-		return nil, refreshErr
+		failure := Failure{}.NewUnprocessableEntity("unprocessable refresh token")
+		jwt.logger.Error(failure.Message(), logger.Error(refreshErr))
+		span.RecordError(refreshErr)
+		return nil, failure
 	}
 
 	return tokenDetail, nil
@@ -87,10 +96,14 @@ func createToken(userId uint64, secret string, token *models.Token) error {
 // failureUnprocessableEntity
 // 	failureUnautorized         = failures.Network{}.NewUnauthorized("unauthorized")
 // failureUnautorized
-func (jwt *jwt) ExtractTokenMetadata(tokenString string, tokenType TokenType) (*models.AccessDetails, failures.Failure) {
-	token, err := jwt.verifyToken(tokenString, tokenType)
-	if err != nil {
-		return nil, err
+func (jwt *jwt) ExtractTokenMetadata(ctx context.Context, tokenString string, tokenType TokenType) (*models.AccessDetails, failures.Failure) {
+	ctx, span := jwt.tracer.Start(ctx, "jwt.extract_token_metadata")
+	defer span.End()
+
+	token, failure := jwt.verifyToken(tokenString, tokenType)
+	if failure != nil {
+		span.RecordError(failure)
+		return nil, failure
 	}
 
 	claims, ok := token.Claims.(jwtPkg.MapClaims)
@@ -103,16 +116,19 @@ func (jwt *jwt) ExtractTokenMetadata(tokenString string, tokenType TokenType) (*
 		userIdStr := fmt.Sprintf("%.f", claims["user_id"])
 		userId, err := strconv.ParseUint(userIdStr, 10, 64)
 		if err != nil {
+			span.RecordError(err)
 			return nil, err
 		}
 
 		return &models.AccessDetails{TokenUuid: tokenUuid, UserId: userId}, nil
 	}
 
-	return nil, errors.New("invalid token")
+	err = errors.New("invalid token")
+	span.RecordError(err)
+	return nil, err
 }
 
-func (jwt *jwt) TokenValid(tokenString string, tokenType TokenType) error {
+func (jwt *jwt) TokenValid(ctx context.Context, tokenString string, tokenType TokenType) failures.Failure {
 	token, err := jwt.verifyToken(tokenString, tokenType)
 	if err != nil {
 		return err
@@ -125,7 +141,7 @@ func (jwt *jwt) TokenValid(tokenString string, tokenType TokenType) error {
 	return nil
 }
 
-func (jwt *jwt) verifyToken(tokenString string, tokenType TokenType) (*jwtPkg.Token, error) {
+func (jwt *jwt) verifyToken(tokenString string, tokenType TokenType) (*jwtPkg.Token, failures.Failure) {
 	var secret string
 	if tokenType == Access {
 		secret = jwt.config.AccessSecret
@@ -141,7 +157,7 @@ func (jwt *jwt) verifyToken(tokenString string, tokenType TokenType) (*jwtPkg.To
 	return token, nil
 }
 
-//checkSigningMethod checks the token method conform to "SigningMethodHMAC"
+// checkSigningMethod checks the token method conform to "SigningMethodHMAC"
 func (jwt *jwt) checkSigningMethod(secret string) jwtPkg.Keyfunc {
 	return func(token *jwtPkg.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwtPkg.SigningMethodHMAC); !ok {
