@@ -16,6 +16,11 @@ require (
 	github.com/spf13/cobra v1.2.1
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
+	go.opentelemetry.io/otel v1.0.0-RC3
+	go.opentelemetry.io/otel/exporters/jaeger v1.0.0-RC3
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.0.0-RC3
+	go.opentelemetry.io/otel/sdk v1.0.0-RC3
+	go.opentelemetry.io/otel/trace v1.0.0-RC3
 	go.uber.org/zap v1.19.0
 	google.golang.org/grpc v1.38.0
 	google.golang.org/protobuf v1.26.0

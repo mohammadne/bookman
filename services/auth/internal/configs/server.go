@@ -2,7 +2,8 @@ package configs
 
 import (
 	"github.com/kelseyhightower/envconfig"
-	"github.com/mohammadne/bookman/auth/internal/database"
+	"github.com/mohammadne/bookman/auth/internal/cache"
+	"github.com/mohammadne/bookman/auth/internal/jwt"
 	"github.com/mohammadne/bookman/auth/internal/network/grpc"
 	"github.com/mohammadne/bookman/auth/internal/network/rest_api"
 	"github.com/mohammadne/bookman/auth/pkg/logger"
@@ -12,7 +13,8 @@ import (
 type server struct {
 	Logger   *logger.Config
 	Tracer   *tracer.Config
-	Database *database.Config
+	Jwt      *jwt.Config
+	Cache    *cache.Config
 	RestApi  *rest_api.Config
 	AuthGrpc *grpc.Config
 	UserGrpc *grpc.Config
@@ -34,7 +36,8 @@ func Server(env string) *server {
 func (config *server) loadProd() {
 	config.Logger = &logger.Config{}
 	config.Tracer = &tracer.Config{}
-	config.Database = &database.Config{}
+	config.Jwt = &jwt.Config{}
+	config.Cache = &cache.Config{}
 	config.RestApi = &rest_api.Config{}
 	config.AuthGrpc = &grpc.Config{}
 	config.UserGrpc = &grpc.Config{}
@@ -43,7 +46,8 @@ func (config *server) loadProd() {
 	envconfig.MustProcess("library", config)
 	envconfig.MustProcess("library_logger", config.Logger)
 	envconfig.MustProcess("library_tracer", config.Tracer)
-	envconfig.MustProcess("library_database", config.Database)
+	envconfig.MustProcess("library_jwt", config.Jwt)
+	envconfig.MustProcess("library_cache", config.Cache)
 	envconfig.MustProcess("library_rest_api", config.RestApi)
 	envconfig.MustProcess("auth_grpc", config.AuthGrpc)
 	envconfig.MustProcess("user_grpc", config.UserGrpc)
@@ -67,14 +71,15 @@ func (config *server) loadDev() {
 		Subsystem:  "library",
 	}
 
-	config.Database = &database.Config{
-		Driver:       "mysql",
-		Host:         "localhost",
-		Port:         "3306",
-		User:         "root",
-		Password:     "password",
-		DatabaseName: "bookman",
-		SSLMode:      "",
+	config.Jwt = &jwt.Config{
+		AccessSecret:   "4ykllbAMpImzZlE",
+		AccessExpires:  1,
+		RefreshSecret:  "sezXJL0Jl5kO0Du",
+		RefreshExpires: 168,
+	}
+
+	config.Cache = &cache.Config{
+		URL: "localhost:6379",
 	}
 
 	config.RestApi = &rest_api.Config{
