@@ -2,12 +2,13 @@ package grpc
 
 import (
 	context "context"
+	"fmt"
 	"net"
 
 	"github.com/mohammadne/bookman/auth/internal/cache"
 	"github.com/mohammadne/bookman/auth/internal/jwt"
+	"github.com/mohammadne/bookman/auth/internal/models/pb"
 	"github.com/mohammadne/bookman/auth/internal/network"
-	"github.com/mohammadne/bookman/auth/internal/network/grpc/contracts"
 	"github.com/mohammadne/go-pkgs/logger"
 	"google.golang.org/grpc"
 )
@@ -21,20 +22,21 @@ type grpcServer struct {
 
 	// internal dependencies
 	server *grpc.Server
-	contracts.UnimplementedAuthServer
+	pb.UnimplementedAuthServer
 }
 
 func NewServer(cfg *Config, log logger.Logger, c cache.Cache, j jwt.Jwt) network.Server {
 	s := &grpcServer{config: cfg, logger: log, cache: c, jwt: j}
 
 	s.server = grpc.NewServer()
-	contracts.RegisterAuthServer(s.server, s)
+	pb.RegisterAuthServer(s.server, s)
 
 	return s
 }
 
 func (s *grpcServer) Serve(<-chan struct{}) {
-	listener, err := net.Listen("tcp", s.config.Url)
+	address := fmt.Sprintf("%s:%s", s.config.Host, s.config.Port)
+	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		panic(err)
 	}
@@ -42,8 +44,8 @@ func (s *grpcServer) Serve(<-chan struct{}) {
 	s.server.Serve(listener)
 }
 
-func (s *grpcServer) TokenMetadata(ctx context.Context, token *contracts.TokenContract,
-) (*contracts.TokenMetadataResponse, error) {
+func (s *grpcServer) TokenMetadata(ctx context.Context, token *pb.TokenContract,
+) (*pb.TokenMetadataResponse, error) {
 	accessDetails, err := s.jwt.ExtractTokenMetadata(token.Token, jwt.Access)
 	if err != nil {
 		return nil, err
@@ -54,5 +56,5 @@ func (s *grpcServer) TokenMetadata(ctx context.Context, token *contracts.TokenCo
 		return nil, err
 	}
 
-	return &contracts.TokenMetadataResponse{IsValid: true, Id: userId}, nil
+	return &pb.TokenMetadataResponse{IsValid: true, Id: userId}, nil
 }

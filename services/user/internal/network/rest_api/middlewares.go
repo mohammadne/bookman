@@ -10,7 +10,7 @@ import (
 	"github.com/mohammadne/bookman/user/pkg/logger"
 )
 
-func (rest *restEcho) authenticate(next echo.HandlerFunc) echo.HandlerFunc {
+func (rest *restServer) authenticate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		spanName := "network.rest_api.middlewares.authenticate"
 		ctx, span := rest.tracer.Start(c.Request().Context(), spanName)

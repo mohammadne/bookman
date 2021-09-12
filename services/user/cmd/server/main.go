@@ -5,7 +5,9 @@ import (
 	"github.com/mohammadne/bookman/user/internal/network"
 	"github.com/mohammadne/bookman/user/internal/network/grpc"
 	"github.com/mohammadne/bookman/user/internal/network/rest_api"
+	"github.com/mohammadne/bookman/user/internal/storage"
 
+	"github.com/mohammadne/bookman/user/pkg/database"
 	"github.com/mohammadne/bookman/user/pkg/logger"
 	"github.com/mohammadne/bookman/user/pkg/tracer"
 	"github.com/spf13/cobra"
@@ -40,13 +42,13 @@ func main(cmd *cobra.Command, args []string) {
 		lg.Panic("error getting auth grpc connection", logger.Error(err))
 	}
 
-	// db := database.NewMysqlDatabase(cfg.Database, lg)
-	// db := interface{}
+	database := database.NewMysql(config.Database)
+	storage := storage.NewStorage(lg, tracer, database)
 
 	// serving application servers
 	servers := []network.Server{
-		rest_api.New(config.RestApi, lg, nil, authGrpc),
-		grpc.NewServer(config.UserGrpc, lg, nil),
+		rest_api.New(config.RestApi, lg, tracer, storage, authGrpc),
+		grpc.NewServer(config.UserGrpc, lg, tracer, storage),
 	}
 
 	for _, server := range servers {

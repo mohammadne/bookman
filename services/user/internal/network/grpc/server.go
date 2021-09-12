@@ -26,8 +26,8 @@ type grpcServer struct {
 	pb.UnimplementedUserServer
 }
 
-func NewServer(cfg *Config, log logger.Logger, storage storage.Storage) *grpcServer {
-	s := &grpcServer{config: cfg, logger: log, storage: storage}
+func NewServer(cfg *Config, log logger.Logger, t trace.Tracer, storage storage.Storage) *grpcServer {
+	s := &grpcServer{config: cfg, logger: log, tracer: t, storage: storage}
 
 	s.server = grpc.NewServer()
 	pb.RegisterUserServer(s.server, s)

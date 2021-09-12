@@ -11,7 +11,7 @@ import (
 	"github.com/mohammadne/bookman/user/pkg/logger"
 )
 
-func (rest *restEcho) getUser(c echo.Context) error {
+func (rest *restServer) getUser(c echo.Context) error {
 	spanName := "network.rest_api.handlers.get_user"
 	ctx, span := rest.tracer.Start(c.Request().Context(), spanName)
 	defer span.End()
@@ -25,7 +25,7 @@ func (rest *restEcho) getUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, user.Marshall(true))
 }
 
-func (rest *restEcho) getMyUser(c echo.Context) error {
+func (rest *restServer) getMyUser(c echo.Context) error {
 	spanName := "network.rest_api.handlers.get_my_user"
 	ctx, span := rest.tracer.Start(c.Request().Context(), spanName)
 	defer span.End()
@@ -40,7 +40,7 @@ func (rest *restEcho) getMyUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, user.Marshall(false))
 }
 
-func (rest *restEcho) getUserByIdString(ctx context.Context, idStr string) (*models.User, failures.Failure) {
+func (rest *restServer) getUserByIdString(ctx context.Context, idStr string) (*models.User, failures.Failure) {
 	if idStr == "" {
 		return nil, failures.Network{}.NewBadRequest("invalid id is given")
 	}

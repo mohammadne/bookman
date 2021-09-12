@@ -25,11 +25,11 @@ func NewAuthClient(cfg *Config, lg logger.Logger, tracer trace.Tracer) (*authCli
 	client := &authClient{logger: lg, tracer: tracer}
 
 	Address := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
-	authConnection, err := grpcPkg.Dial(Address, grpcPkg.WithInsecure())
+	connection, err := grpcPkg.Dial(Address, grpcPkg.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
-	client.api = pb.NewAuthClient(authConnection)
+	client.api = pb.NewAuthClient(connection)
 
 	return client, nil
 }

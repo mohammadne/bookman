@@ -11,7 +11,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type restEcho struct {
+type restServer struct {
 	// injected parameters
 	config   *Config
 	logger   logger.Logger
@@ -23,8 +23,8 @@ type restEcho struct {
 	echo *echo.Echo
 }
 
-func New(cfg *Config, log logger.Logger, s storage.Storage, ac grpc.AuthClient) *restEcho {
-	handler := &restEcho{config: cfg, logger: log, storage: s, authGrpc: ac}
+func New(cfg *Config, lg logger.Logger, t trace.Tracer, s storage.Storage, ac grpc.AuthClient) *restServer {
+	handler := &restServer{config: cfg, logger: lg, tracer: t, storage: s, authGrpc: ac}
 
 	handler.echo = echo.New()
 	handler.echo.HideBanner = true
@@ -33,15 +33,15 @@ func New(cfg *Config, log logger.Logger, s storage.Storage, ac grpc.AuthClient) 
 	return handler
 }
 
-func (rest *restEcho) setupRoutes() {
+func (rest *restServer) setupRoutes() {
 	rest.echo.POST("/metrics", echo.WrapHandler(promhttp.Handler()))
 
-	authGroup := rest.echo.Group("/users")
-	authGroup.GET("/:id", rest.getUser, rest.authenticate)
-	authGroup.GET("/me", rest.getMyUser, rest.authenticate)
+	userGroup := rest.echo.Group("/users")
+	userGroup.GET("/:id", rest.getUser, rest.authenticate)
+	userGroup.GET("/me", rest.getMyUser, rest.authenticate)
 }
 
-func (rest *restEcho) Serve(<-chan struct{}) {
+func (rest *restServer) Serve(<-chan struct{}) {
 	Address := fmt.Sprintf("%s:%s", rest.config.Host, rest.config.Port)
 	rest.logger.Info("starting server", logger.String("address", Address))
 	if err := rest.echo.Start(Address); err != nil {
