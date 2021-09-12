@@ -77,7 +77,7 @@ func (handler restServer) signOut(c echo.Context) error {
 	defer span.End()
 
 	tokenString := extractToken(c.Request())
-	accessDetails, failure := handler.jwt.ExtractTokenMetadata(tokenString, jwt.Access)
+	accessDetails, failure := handler.jwt.ExtractTokenMetadata(ctx, tokenString, jwt.Access)
 	if failure != nil {
 		span.RecordError(failure)
 		return c.JSON(failure.Status(), failure)
@@ -106,7 +106,7 @@ func (handler restServer) refreshToken(c echo.Context) error {
 		return c.JSON(failureInvalidBody.Status(), failureInvalidBody)
 	}
 
-	accessDetails, failure := handler.jwt.ExtractTokenMetadata(body.RefreshToken, jwt.Refresh)
+	accessDetails, failure := handler.jwt.ExtractTokenMetadata(ctx, body.RefreshToken, jwt.Refresh)
 	if failure != nil {
 		span.RecordError(failure)
 		return c.JSON(failure.Status(), failure)
@@ -128,7 +128,7 @@ func (handler restServer) refreshToken(c echo.Context) error {
 }
 
 func (handler restServer) generateTokens(ctx context.Context, userId uint64) (map[string]string, failures.Failure) {
-	jwt, failure := handler.jwt.CreateJwt(userId)
+	jwt, failure := handler.jwt.CreateJwt(ctx, userId)
 	if failure != nil {
 		return nil, failure
 	}

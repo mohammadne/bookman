@@ -48,7 +48,7 @@ func (s *grpcServer) Serve(<-chan struct{}) {
 
 func (s *grpcServer) TokenMetadata(ctx context.Context, token *pb.TokenContract,
 ) (*pb.TokenMetadataResponse, error) {
-	accessDetails, err := s.jwt.ExtractTokenMetadata(token.Token, jwt.Access)
+	accessDetails, err := s.jwt.ExtractTokenMetadata(ctx, token.Token, jwt.Access)
 	if err != nil {
 		return nil, err
 	}

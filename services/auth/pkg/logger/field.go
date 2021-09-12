@@ -17,8 +17,8 @@ type Field struct {
 	Type  FieldType
 }
 
-// Unknown constructs a field with the given key and value.
-func Unknown(key string, val interface{}) Field {
+// Any constructs a field with the given key and value.
+func Any(key string, val interface{}) Field {
 	return Field{Key: key, Value: val, Type: UnknownType}
 }
 
