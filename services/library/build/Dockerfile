@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY . .
 
+RUN echo $PWD
+
 RUN go mod download && go build -o /bin/app ./cmd/root.go
 
 FROM alpine:latest
