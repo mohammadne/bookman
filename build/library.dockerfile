@@ -4,9 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN go mod download
-
-RUN make ent-get && make ent-init && make ent-generate
+RUN go mod download && make ent-generate
 
 RUN go build -o /bin/app ./cmd/root.go
 
