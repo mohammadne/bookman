@@ -1,10 +1,10 @@
-name: library-ci
+name: publish
 
 on: [push]
 
 jobs:
-  publish:
-    name: docker
+  library:
+    name: publish-library
     runs-on: ubuntu-latest
     # needs:
 
