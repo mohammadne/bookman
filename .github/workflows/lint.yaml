@@ -1,4 +1,4 @@
-name: library-ci
+name: lint
 
 on: [push]
 
