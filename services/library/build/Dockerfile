@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN echo $PWD
+RUN ls -alh
 
 RUN go mod download && go build -o /bin/app ./cmd/root.go
 
