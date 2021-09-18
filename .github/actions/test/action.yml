@@ -11,6 +11,7 @@ runs:
   steps:
     - uses: actions/setup-go@v2
     - run: cd ./services/${{ inputs.service }} && make test
+      shell: bash
     - uses: codecov/codecov-action@v1
       with:
         files: coverage.out
