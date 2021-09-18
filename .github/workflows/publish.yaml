@@ -36,8 +36,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-      # - name: Build bookman-library Docker image
-      #   run: |
-      #     docker build -f ./services/library/build/Dockerfile -t bookman-library . --tag ghcr.io/mohammadne/bookman-library:latest
-      #     docker run ghcr.io/mohammadne/bookman-library:latest
-      #     docker push ghcr.io/mohammadne/bookman-library:latest
+      - name: print steps.meta
+        run: |
+          echo ${{ steps.meta.outputs.tags }}
+          echo ${{ steps.meta.outputs.labels }}

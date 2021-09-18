@@ -1,6 +1,6 @@
 module github.com/mohammadne/bookman/library
 
-go 1.16
+go 1.17
 
 require (
 	entgo.io/ent v0.9.1

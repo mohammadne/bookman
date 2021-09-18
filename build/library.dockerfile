@@ -1,10 +1,8 @@
-FROM golang:1.16.0 AS builder
+FROM golang:1.17 AS builder
 
 WORKDIR /app
 
 COPY . .
-
-RUN ls -alh
 
 RUN go mod download
 
