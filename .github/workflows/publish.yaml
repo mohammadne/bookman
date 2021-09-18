@@ -28,16 +28,16 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-      - uses: docker/build-push-action@v2
-        with:
-          file: "services/library/build/Dockerfile"
-          context: ./..
-          platforms: linux/amd64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-      # - name: Build bookman-library Docker image
-      #   run: |
-      #     docker build -f ./services/library/build/Dockerfile -t bookman-library . --tag ghcr.io/mohammadne/bookman-library:latest
-      #     docker run ghcr.io/mohammadne/bookman-library:latest
-      #     docker push ghcr.io/mohammadne/bookman-library:latest
+      # - uses: docker/build-push-action@v2
+      #   with:
+      #     file: "services/library/build/Dockerfile"
+      #     context: ./..
+      #     platforms: linux/amd64
+      #     push: true
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
+      - name: Build bookman-library Docker image
+        run: |
+          docker build -f ./services/library/build/Dockerfile -t bookman-library . --tag ghcr.io/mohammadne/bookman-library:latest
+          docker run ghcr.io/mohammadne/bookman-library:latest
+          docker push ghcr.io/mohammadne/bookman-library:latest
