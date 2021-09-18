@@ -7,6 +7,7 @@ import (
 	"github.com/mohammadne/bookman/library/internal/database/ent"
 	impl "github.com/mohammadne/bookman/library/internal/database/impl"
 	"github.com/mohammadne/bookman/library/pkg/logger"
+
 	"go.opentelemetry.io/otel/trace"
 )
 
