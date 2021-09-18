@@ -22,7 +22,7 @@ jobs:
       - uses: docker/metadata-action@v3
         id: meta
         with:
-          images: ghcr.io/mohammadne/bookman
+          images: ghcr.io/mohammadne/bookman-library
           tags: |
             type=ref,event=branch
             type=ref,event=pr
