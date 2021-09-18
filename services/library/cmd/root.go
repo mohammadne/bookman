@@ -22,21 +22,3 @@ func main() {
 		panic(map[string]string{"reason": errExecuteCMD, "error": err.Error()})
 	}
 }
-
-// cfg := config.Load(config.Development)
-// lg := logger.NewZap(cfg.Logger)
-
-// // root subcommands
-// serverCmd := server.Server{
-// 	Config: cfg,
-// 	Logger: lg,
-// }.Command()
-
-// // create root command and add sub-commands to it
-// cmd := &cobra.Command{Use: use, Short: short, Long: long}
-// cmd.AddCommand(serverCmd)
-
-// // run cobra root cmd
-// if err := cmd.Execute(); err != nil {
-// 	lg.Panic(errExecuteCMD, logger.Error(err))
-// }
