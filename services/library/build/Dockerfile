@@ -14,6 +14,8 @@ COPY --from=builder /bin/app .
 
 EXPOSE 8080
 
+LABEL org.opencontainers.image.source="https://github.com/mohammadne/bookman-library"
+
 ENTRYPOINT ["/bin/app"]
 
 CMD ["server", "--env=dev"]
