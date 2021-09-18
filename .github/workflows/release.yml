@@ -1,4 +1,4 @@
-name: releases
+name: release
 
 on:
   workflow_run:
@@ -12,6 +12,30 @@ env:
   password: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
+  auth:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    name: auth
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/release
+        with:
+          registry: ${{ env.registry }}
+          password: ${{ env.password }}
+          service: auth
+
+  user:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    name: user
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/release
+        with:
+          registry: ${{ env.registry }}
+          password: ${{ env.password }}
+          service: user
+
   library:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: library

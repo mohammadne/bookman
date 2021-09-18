@@ -14,7 +14,7 @@ WORKDIR /bin/
 
 COPY --from=builder /bin/app .
 
-EXPOSE 8080
+EXPOSE 8082
 
 LABEL org.opencontainers.image.source="https://github.com/mohammadne/bookman-library"
 

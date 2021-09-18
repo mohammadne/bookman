@@ -1,30 +1,23 @@
-FROM golang:1.16.0 AS builder
+FROM golang:1.17 AS builder
 
 WORKDIR /app
-
-# We want to populate the module cache based on the go.{mod,sum} files.
-COPY go.mod .
-COPY go.sum .
-
-RUN go mod download
 
 COPY . .
 
-RUN go build -o ./dist/bookman-auth ./cmd/root.go
+RUN go mod download
 
-FROM golang:1.16.0 AS bin
+RUN go build -o /bin/app ./cmd/root.go
 
-WORKDIR /app
+FROM alpine:latest
 
-# update and install dependency
-RUN apt-get update
+WORKDIR /bin/
 
-# Copy our static executable.
-COPY --from=builder /app/.env /app/.env
-COPY --from=builder /app/dist/bookman-auth /app/bookman-auth
+COPY --from=builder /bin/app .
 
-VOLUME /app/downloads
+EXPOSE 8080
 
-ENTRYPOINT ["/app/bookman-auth"]
+LABEL org.opencontainers.image.source="https://github.com/mohammadne/bookman-auth"
 
-CMD ["server", "--env=prod"]
+ENTRYPOINT ["/bin/app"]
+
+CMD ["server", "--env=dev"]
