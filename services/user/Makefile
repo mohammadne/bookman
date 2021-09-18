@@ -1,4 +1,4 @@
 ########################################################## TESTs
 
-test: ent-generate
+test:
 	go test -v ./... -covermode=atomic -coverprofile=coverage.out
