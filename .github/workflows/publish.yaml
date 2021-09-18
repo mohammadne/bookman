@@ -30,7 +30,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
       - uses: docker/build-push-action@v2
         with:
-          file: "./services/library/build/Dockerfile"
+          file: "./build/library.Dockerfile"
           context: ./services/library
           platforms: linux/amd64
           push: true
