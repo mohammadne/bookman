@@ -5,6 +5,9 @@ inputs:
   registry:
     description: "name of registry repository"
     required: true
+  password:
+    description: "password of registry repository"
+    required: true
   service:
     description: "List of Docker images to use as base name for tags"
     required: true
@@ -18,7 +21,7 @@ runs:
       with:
         registry: ${{ inputs.registry }}
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ inputs.password }}
 
     - name: "Extract metadata"
       uses: docker/metadata-action@v3

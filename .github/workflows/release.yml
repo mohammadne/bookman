@@ -9,6 +9,7 @@ on:
 
 env:
   registry: ghcr.io
+  password: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   library:
@@ -17,7 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/release
+      - uses: .github/actions/release
         with:
           registry: ${{ env.registry }}
+          password: ${{ env.password }}
           service: library
