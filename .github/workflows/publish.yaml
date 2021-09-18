@@ -28,6 +28,8 @@ jobs:
     needs:
       - base
     steps:
+      - uses: actions/checkout@v2
+
       # Extract metadata
       - uses: docker/metadata-action@v3
         id: meta
