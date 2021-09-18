@@ -14,5 +14,5 @@ ent-generate: ent-init
 
 ########################################################## TESTs
 
-test:
+test: ent-generate
 	go test -v ./... -covermode=atomic -coverprofile=coverage.out

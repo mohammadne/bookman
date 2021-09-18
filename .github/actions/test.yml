@@ -1,0 +1,16 @@
+name: "Run specifies Go tests"
+description: "Run in service makefile tests"
+
+inputs:
+  service:
+    description: "List of Docker images to use as base name for tags"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-go@v2
+    - run: cd ./services/${{ inputs.service }} && make test
+    - uses: codecov/codecov-action@v1
+      with:
+        files: coverage.out

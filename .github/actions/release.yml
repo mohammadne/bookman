@@ -1,0 +1,38 @@
+name: "Compile Docker images"
+description: "Compile images using Docker"
+
+inputs:
+  registry:
+    description: "name of registry repository"
+    required: true
+  service:
+    description: "List of Docker images to use as base name for tags"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: ./login
+      with:
+        registry: ${{ inputs.registry }}
+
+    - name: "Extract metadata"
+      uses: docker/metadata-action@v3
+      id: meta
+      with:
+        images: ${{ inputs.registry }}/mohammadne/bookman-${{ inputs.service }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+
+    - name: "Build and push Docker image"
+      uses: docker/build-push-action@v2
+      with:
+        file: "./build/${{ inputs.service }}.dockerfile"
+        context: ./services/${{ inputs.service }}
+        platforms: linux/amd64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
