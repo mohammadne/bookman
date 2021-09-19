@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN go mod download && make ent-generate
+RUN go mod download && make generate
 
 RUN go build -o /bin/app ./cmd/root.go
 
@@ -20,4 +20,4 @@ LABEL org.opencontainers.image.source="https://github.com/mohammadne/bookman-${{
 
 ENTRYPOINT ["/bin/app"]
 
-CMD ["server", "--env=dev"]
+CMD ["server", "--env=${{ ENV }}"]
