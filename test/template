@@ -1,2 +1,0 @@
-FROM ruby:%%RUBY_VERSION%%
-CMD ruby --version
