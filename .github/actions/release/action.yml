@@ -37,7 +37,7 @@ runs:
     - name: "Build and push Docker image"
       uses: docker/build-push-action@v2
       with:
-        file: "./build/${{ inputs.service }}.dockerfile"
+        file: "./build/${{ inputs.service }}/Dockerfile"
         context: ./services/${{ inputs.service }}
         platforms: linux/amd64
         push: true

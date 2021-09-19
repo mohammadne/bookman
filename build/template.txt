@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN go mod download
+RUN go mod download && make ent-generate
 
 RUN go build -o /bin/app ./cmd/root.go
 
@@ -14,9 +14,9 @@ WORKDIR /bin/
 
 COPY --from=builder /bin/app .
 
-EXPOSE 8080
+EXPOSE ${{ EXPOSED_PORT }}
 
-LABEL org.opencontainers.image.source="https://github.com/mohammadne/bookman-auth"
+LABEL org.opencontainers.image.source="https://github.com/mohammadne/bookman-${{ SERVICE }}"
 
 ENTRYPOINT ["/bin/app"]
 
