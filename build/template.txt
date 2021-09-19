@@ -10,6 +10,8 @@ RUN go build -o /bin/app ./cmd/root.go
 
 FROM alpine:latest
 
+RUN apk add --no-cache libc6-compat
+
 WORKDIR /bin/
 
 COPY --from=builder /bin/app .
