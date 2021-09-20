@@ -1,12 +1,15 @@
 kind: Service
-apiVersion: v1
 metadata:
-  name: bookman-auth
+  name: bookman-auth-service
+  labels:
+    app: bookman-auth-service
 spec:
+  type: ClusterIP
   ports:
-    - name: http
-      protocol: TCP
-      port: 8080
-      targetPort: 8080
+    - name: redis
+      port: 6379
+      targetPort: redis
+  clusterIP: None
   selector:
-    app: bookman-auth
+    app: redis
+    role: master
