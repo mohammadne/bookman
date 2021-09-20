@@ -6,13 +6,16 @@ inputs:
   namespace:
     description: "name of the namespace"
     required: true
+  okteto-token:
+    description: "personal okteto token"
+    required: true
 
 runs:
   using: "composite"
   steps:
     - uses: okteto/login@latest
       with:
-        token: ${{ secrets.OKTETO_TOKEN }}
+        token: ${{ inputs.okteto-token }}
 
     - name: "Activate Namespace"
       uses: okteto/namespace@latest
