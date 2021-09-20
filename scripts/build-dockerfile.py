@@ -4,16 +4,15 @@ import os
 
 
 class Config:
-    def __init__(self, service, port, env):
+    def __init__(self, service, env):
         self.service = service
-        self.port = port
         self.env = env
 
 
 configs = [
-    Config("auth", "8080", "dev"),
-    Config("user", "8081", "dev"),
-    Config("library", "8082", "dev"),
+    Config("auth", "prod"),
+    Config("user", "prod"),
+    Config("library", "prod"),
 ]
 
 pathToDir = "../build"
@@ -27,7 +26,6 @@ for config in configs:
     fileName = copyfile(template, f"{outputDir}/Dockerfile")
 
     with open(fileName, "rt") as file:
-        replacedText = file.read().replace('${{ EXPOSED_PORT }}', config.port)
         replacedText = replacedText.replace('${{ SERVICE }}', config.service)
         replacedText = replacedText.replace('${{ ENV }}', config.env)
 

@@ -16,8 +16,6 @@ WORKDIR /bin/
 
 COPY --from=builder /bin/app .
 
-EXPOSE ${{ EXPOSED_PORT }}
-
 LABEL org.opencontainers.image.source="https://github.com/mohammadne/bookman-${{ SERVICE }}"
 
 ENTRYPOINT ["/bin/app"]
