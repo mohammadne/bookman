@@ -26,5 +26,6 @@ runs:
     - name: "Trigger the pipeline"
       uses: okteto/pipeline@latest
       with:
-        name: ${{ inputs.service }}-${{ inputs.sha }}
+        name: ${{ inputs.service }}
         timeout: 5m
+        variables: "COMMIT_SHA=${{ inputs.sha }}"
