@@ -6,7 +6,7 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      app: bookman-user-deployment
+      app: bookman-user-replicaset
   template:
     metadata:
       labels:
