@@ -25,3 +25,5 @@ jobs:
         with:
           namespace: ${{ env.namespace }}
           okteto-token: ${{ env.okteto-token }}
+          service: ${{ matrix.service }}
+          sha: ${GITHUB_SHA}

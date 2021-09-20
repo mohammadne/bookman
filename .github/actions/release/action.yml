@@ -3,6 +3,12 @@ name: "Release images on Okteto"
 description: "Release images on Okteto"
 
 inputs:
+  service:
+    description: "name of the service"
+    required: true
+  sha:
+    description: "commit SHA"
+    required: true
   namespace:
     description: "name of the namespace"
     required: true
@@ -25,5 +31,5 @@ runs:
     - name: "Trigger the pipeline"
       uses: okteto/pipeline@latest
       with:
-        name: pr-${{ github.event.number }}
+        name: ${{ inputs.service }}-${inputs.sha}
         timeout: 8m
