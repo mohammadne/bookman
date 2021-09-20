@@ -8,7 +8,7 @@ on:
       - completed
 
 env:
-  namespace: bookman
+  namespace: mohammadne
   okteto-token: ${{ secrets.OKTETO_TOKEN }}
 
 jobs:
