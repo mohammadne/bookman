@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/test
+      - uses: actions/setup-go@v2
+      - run: cd ./services/${{ matrix.service }} && make test
+      - uses: codecov/codecov-action@v1
         with:
-          service: ${{ matrix.service }}
+          files: coverage.out

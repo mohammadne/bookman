@@ -12,31 +12,12 @@ env:
   okteto-token: ${{ secrets.OKTETO_TOKEN }}
 
 jobs:
-  auth:
+  release:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    name: auth
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/release
-        with:
-          namespace: ${{ env.namespace }}
-          okteto-token: ${{ env.okteto-token }}
-
-  user:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    name: user
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/release
-        with:
-          namespace: ${{ env.namespace }}
-          okteto-token: ${{ env.okteto-token }}
-
-  library:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    name: library
+    name: release
+    strategy:
+      matrix:
+        service: [auth, user, library]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

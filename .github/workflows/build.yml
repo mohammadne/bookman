@@ -12,9 +12,12 @@ env:
   password: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  auth:
+  build:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    name: auth
+    name: build
+    strategy:
+      matrix:
+        service: [auth, user, library]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,28 +25,4 @@ jobs:
         with:
           registry: ${{ env.registry }}
           password: ${{ env.password }}
-          service: auth
-
-  user:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    name: user
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/build
-        with:
-          registry: ${{ env.registry }}
-          password: ${{ env.password }}
-          service: user
-
-  library:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    name: library
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/build
-        with:
-          registry: ${{ env.registry }}
-          password: ${{ env.password }}
-          service: library
+          service: ${{ matrix.service }}
