@@ -15,6 +15,9 @@ spec:
       containers:
         - name: bookman-user-container
           image: ghcr.io/mohammadne/bookman-user:develop
+          envFrom:
+            - configMapRef:
+              name: service-configmap
           ports:
             - containerPort: 8082
           resources:
