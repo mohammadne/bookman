@@ -3,29 +3,14 @@ name: test
 on: [push]
 
 jobs:
-  auth:
-    name: auth
+  test:
+    name: test
+    strategy:
+      matrix:
+        service: [auth, user, library]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/test
         with:
-          service: auth
-
-  user:
-    name: user
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/test
-        with:
-          service: user
-
-  library:
-    name: library
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/test
-        with:
-          service: library
+          service: ${{ matrix.service }}
