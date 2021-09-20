@@ -1,14 +1,15 @@
-name: release
+name: build
 
 on:
   workflow_run:
-    workflows: ["build"]
+    workflows: ["test"]
     branches: [master, develop]
     types:
       - completed
 
 env:
-  namespace: bookman
+  registry: ghcr.io
+  password: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   auth:
@@ -17,9 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/release
+      - uses: ./.github/actions/build
         with:
-          namespace: ${{ env.namespace }}
+          registry: ${{ env.registry }}
+          password: ${{ env.password }}
+          service: auth
 
   user:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -27,9 +30,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/release
+      - uses: ./.github/actions/build
         with:
-          namespace: ${{ env.namespace }}
+          registry: ${{ env.registry }}
+          password: ${{ env.password }}
+          service: user
 
   library:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -37,6 +42,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/release
+      - uses: ./.github/actions/build
         with:
-          namespace: ${{ env.namespace }}
+          registry: ${{ env.registry }}
+          password: ${{ env.password }}
+          service: library

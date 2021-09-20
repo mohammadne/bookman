@@ -1,49 +1,26 @@
-name: "Compile Docker images"
-description: "Compile images using Docker"
+name: "Release images on Okteto"
+
+description: "Release images on Okteto"
 
 inputs:
-  registry:
-    description: "name of registry repository"
-    required: true
-  password:
-    description: "password of registry repository"
-    required: true
-  service:
-    description: "List of Docker images to use as base name for tags"
+  namespace:
+    description: "name of the namespace"
     required: true
 
 runs:
   using: "composite"
   steps:
-    - uses: docker/setup-buildx-action@v1
-
-    - uses: docker/login-action@v1
+    - uses: okteto/login@latest
       with:
-        registry: ${{ inputs.registry }}
-        username: ${{ github.actor }}
-        password: ${{ inputs.password }}
+        token: ${{ secrets.OKTETO_TOKEN }}
 
-    - name: "Extract metadata"
-      uses: docker/metadata-action@v3
-      id: meta
+    - name: "Activate Namespace"
+      uses: okteto/namespace@latest
       with:
-        images: ${{ inputs.registry }}/mohammadne/bookman-${{ inputs.service }}
-        tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
+        name: ${{ inputs.namespace }}
 
-    - name: "Build Dockerfiles"
-      run: make build-dockerfiles
-      shell: bash
-
-    - name: "Build and push Docker image"
-      uses: docker/build-push-action@v2
+    - name: "Trigger the pipeline"
+      uses: okteto/pipeline@latest
       with:
-        file: "./build/${{ inputs.service }}/Dockerfile"
-        context: ./services/${{ inputs.service }}
-        platforms: linux/amd64
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        name: pr-${{ github.event.number }}
+        timeout: 8m
