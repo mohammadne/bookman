@@ -21,4 +21,4 @@ jobs:
         with:
           okteto-token: ${{ secrets.OKTETO_TOKEN }}
           service: ${{ matrix.service }}
-          sha: ${GITHUB_SHA}
+          sha: ${{ github.sha }}
