@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bookman-user-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bookman-user-deployment
+  template:
+    metadata:
+      labels:
+        app: bookman-user-replicaset
+    spec:
+      containers:
+        - name: bookman-user-container
+          image: ghcr.io/mohammadne/bookman-user:develop
+          ports:
+            - containerPort: 8082
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
