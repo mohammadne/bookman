@@ -26,8 +26,10 @@ for config in configs:
     fileName = copyfile(template, f"{outputDir}/Dockerfile")
 
     with open(fileName, "rt") as file:
-        replacedText = replacedText.replace('${{ SERVICE }}', config.service)
-        replacedText = replacedText.replace('${{ ENV }}', config.env)
+        content = file.read()
+
+    content = content.replace('${{ SERVICE }}', config.service)
+    content = content.replace('${{ ENV }}', config.env)
 
     with open(fileName, "wt") as file:
-        file.write(replacedText)
+        file.write(content)
