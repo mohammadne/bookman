@@ -21,9 +21,9 @@
 
 ## Microservices:
 
-1. [`User`](https://img.shields.io) is a service for user managment
+1. [`Auth`](https://img.shields.io) is bookman authentication service
 
-2. [`Auth`](https://img.shields.io) is bookman authentication service
+2. [`User`](https://img.shields.io) is a service for user managment
 
 3. [`Library`](https://img.shields.io) is bookman core service, responsible
 for serving books and authors
