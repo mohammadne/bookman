@@ -29,5 +29,5 @@ runs:
       uses: mohammadne/pipeline@54e3d056c0cd5f275ef0eafda168552ae961be17
       with:
         name: ${{ inputs.service }}
-        filePath: .okteto/${{ inputs.service }}-pipeline.yml
+        filename: .okteto/${{ inputs.service }}-pipeline.yml
         namespace: ${{ inputs.namespace }}
