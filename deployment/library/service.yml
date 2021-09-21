@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql.service
+  name: mysql
   labels:
     app: mysql
 spec:
@@ -19,7 +19,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql-client.service
+  name: mysql-read
   labels:
     app: mysql
 spec:

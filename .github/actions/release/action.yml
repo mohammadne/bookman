@@ -24,7 +24,7 @@ runs:
       uses: okteto/namespace@latest
 
     - name: "Trigger the pipeline"
-      uses: mohammadne/pipeline@71ae62ee51ede0969bd28a2bead2c3bb01f64905
+      uses: okteto/pipeline@master
       with:
         name: ${{ inputs.service }}
         timeout: 5m
