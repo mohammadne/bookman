@@ -1,28 +1,28 @@
-name: build
+# name: build
 
-on:
-  workflow_run:
-    workflows: ["test"]
-    branches: [master, develop]
-    types:
-      - completed
+# on:
+#   workflow_run:
+#     workflows: ["test"]
+#     branches: [master, develop]
+#     types:
+#       - completed
 
-env:
-  registry: ghcr.io
-  password: ${{ secrets.GITHUB_TOKEN }}
+# env:
+#   registry: ghcr.io
+#   password: ${{ secrets.GITHUB_TOKEN }}
 
-jobs:
-  build:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    name: build
-    strategy:
-      matrix:
-        service: [auth, user, library]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/build
-        with:
-          registry: ${{ env.registry }}
-          password: ${{ env.password }}
-          service: ${{ matrix.service }}
+# jobs:
+#   build:
+#     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+#     name: build
+#     strategy:
+#       matrix:
+#         service: [auth, user, library]
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: ./.github/actions/build
+#         with:
+#           registry: ${{ env.registry }}
+#           password: ${{ env.password }}
+#           service: ${{ matrix.service }}

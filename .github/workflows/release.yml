@@ -1,11 +1,13 @@
 name: release
 
-on:
-  workflow_run:
-    workflows: ["build"]
-    branches: [master, develop]
-    types:
-      - completed
+on: [push]
+
+# on:
+#   workflow_run:
+#     workflows: ["build"]
+#     branches: [master, develop]
+#     types:
+#       - completed
 
 jobs:
   release:
