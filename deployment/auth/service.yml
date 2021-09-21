@@ -1,8 +1,8 @@
 kind: Service
 metadata:
-  name: bookman-auth-service
+  name: redis
   labels:
-    app: bookman-auth-service
+    app: redis
 spec:
   type: ClusterIP
   ports:
