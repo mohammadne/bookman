@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: bookman-user-deployment
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: bookman-user-replicaset
