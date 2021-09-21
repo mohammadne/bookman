@@ -22,12 +22,12 @@ runs:
 
     - name: "Activate Namespace"
       uses: okteto/namespace@latest
+      with:
+        namespace: ${{ inputs.namespace }}
 
-      # with:
-      #   namespace: ${{ inputs.namespace }}
     - name: "Trigger the pipeline"
-      uses: okteto/pipeline@master
+      uses: mohammadne/pipeline@54e3d056c0cd5f275ef0eafda168552ae961be17
       with:
         name: ${{ inputs.service }}
         filePath: .okteto/${{ inputs.service }}-pipeline.yml
-        # namespace: ${{ inputs.namespace }}
+        namespace: ${{ inputs.namespace }}
