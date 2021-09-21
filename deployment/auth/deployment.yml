@@ -1,0 +1,26 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: redis
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        application: redis
+        version: 3.2.5
+    spec:
+      containers:
+        - image: redis
+          name: redisdb
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+          ports:
+            - containerPort: 6379
+          protocol: TCP
+          volumes:
+            - name: redis-data
+          persistentVolumeClaim:
+          claimName: redisdb-pvc
