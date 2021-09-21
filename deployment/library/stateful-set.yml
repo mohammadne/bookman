@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: mysql
+  name: mysql.stateful-set
 spec:
   selector:
     matchLabels:
       app: mysql
-  serviceName: mysql
+  serviceName: mysql.service
   replicas: 2
   template:
     metadata:
@@ -154,9 +154,9 @@ spec:
       volumes:
         - name: conf
           emptyDir: {}
-        - name: config-map
+        - name: mysql.config-map
           configMap:
-            name: mysql-config-map
+            name: mysql.config-map
   volumeClaimTemplates:
     - metadata:
         name: data
