@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: mysql
+  name: mysql-config-map
   labels:
     app: mysql
 data:

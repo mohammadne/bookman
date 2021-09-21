@@ -156,7 +156,7 @@ spec:
           emptyDir: {}
         - name: config-map
           configMap:
-            name: mysql
+            name: mysql-config-map
   volumeClaimTemplates:
     - metadata:
         name: data
