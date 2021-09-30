@@ -1,16 +1,15 @@
 #!/usr/bin/python
 from shutil import copyfile
+import sys
 import os
 
+buildDirectory = sys.argv[1]
+services = sys.argv[2:]
 
-services = ["auth", "user", "library"]
-environment = "prod"
-
-pathToDir = "../build"
-template = f"{pathToDir}/template.txt"
+template = f"{buildDirectory}/template.txt"
 
 for service in services:
-    outputDir = f"{pathToDir}/{service}"
+    outputDir = f"{buildDirectory}/{service}"
     if not os.path.exists(outputDir):
         os.mkdir(outputDir)
 
@@ -20,7 +19,7 @@ for service in services:
         content = file.read()
 
     content = content.replace('${{ SERVICE }}', service)
-    content = content.replace('${{ ENV }}', environment)
+    content = content.replace('${{ ENV }}', "prod")
 
     with open(fileName, "wt") as file:
         file.write(content)

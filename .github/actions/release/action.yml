@@ -26,7 +26,7 @@ runs:
         namespace: ${{ inputs.namespace }}
 
     - name: "Trigger the pipeline"
-      uses: mohammadne/pipeline@54e3d056c0cd5f275ef0eafda168552ae961be17
+      uses: okteto/pipeline@master
       with:
         name: ${{ inputs.service }}
         filename: .okteto/${{ inputs.service }}-pipeline.yml

@@ -36,7 +36,7 @@ func NewServer(cfg *Config, lg logger.Logger, t trace.Tracer, c cache.Cache, j j
 	return s
 }
 
-func (s *grpcServer) Serve(<-chan struct{}) {
+func (s *grpcServer) Serve() {
 	address := fmt.Sprintf("%s:%s", s.config.Host, s.config.Port)
 	listener, err := net.Listen("tcp", address)
 	if err != nil {

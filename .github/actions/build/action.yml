@@ -28,7 +28,7 @@ runs:
       uses: docker/metadata-action@v3
       id: meta
       with:
-        images: ${{ inputs.registry }}/mohammadne/bookman-${{ inputs.service }}
+        images: ${{ inputs.registry }}/${{ github.actor }}/${{ github.event.repository.name }}-${{ inputs.service }}
         tags: |
           type=ref,event=branch
           type=ref,event=pr

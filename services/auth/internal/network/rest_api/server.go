@@ -45,7 +45,7 @@ func (rest *restServer) setupRoutes() {
 	authGroup.POST("/auth/refresh_token", rest.refreshToken)
 }
 
-func (rest *restServer) Serve(<-chan struct{}) {
+func (rest *restServer) Serve() {
 	Address := fmt.Sprintf("%s:%s", rest.config.Host, rest.config.Port)
 	rest.logger.Info("starting server", logger.String("address", Address))
 	if err := rest.echo.Start(Address); err != nil {
