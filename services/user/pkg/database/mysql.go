@@ -35,12 +35,10 @@ func NewMysql(cfg *Config) Database {
 	client, err := sql.Open(driver, dataSourceName)
 	if err != nil {
 		log.Fatal(errOpenDatabse, logger.Error(err))
-		return nil
 	}
 
 	if err = client.Ping(); err != nil {
 		log.Fatal(errPingDatabse, logger.Error(err))
-		return nil
 	}
 
 	return &mysql{connection: client}
