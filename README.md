@@ -1,3 +1,16 @@
+# ARCHIVE NOTE
+
+THIS REPOSITORY IS NO LONGER MAINTANED
+
+The new repository can be found at: https://github.com/orgs/CafeKetab/repositories
+
+<!-- TITLE -->
+# BOOK MAN
+> an online REST renting book platform which you can authenticate,
+> order, reserve a book in your account.
+>
+> it's a microservices project with highly focus on code architecture.
+
 <!-- LOGO -->
 <p align="center">
   <img src="assets/logo.png" />
@@ -11,13 +24,6 @@
   <img src="https://img.shields.io/github/stars/mohammadne/bookman?style=for-the-badge">
   <img src="https://img.shields.io/github/downloads/mohammadne/bookman/total.svg?style=for-the-badge">
 </p>
-
-<!-- TITLE -->
-# BOOK MAN
-> an online REST renting book platform which you can authenticate,
-> order, reserve a book in your account.
->
-> it's a microservices project with highly focus on code architecture.
 
 ## Microservices:
 
