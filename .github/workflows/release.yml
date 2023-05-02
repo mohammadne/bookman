@@ -1,0 +1,29 @@
+name: release
+
+on: [push]
+
+# on:
+#   workflow_run:
+#     workflows: ["build"]
+#     branches: [master, develop]
+#     types:
+#       - completed
+
+env:
+  namespace: ${{ github.event.repository.name }}-${{ github.actor }}
+
+jobs:
+  release:
+    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    name: release
+    strategy:
+      matrix:
+        service: [auth, user, library]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/release
+        with:
+          namespace: ${{ env.namespace }}
+          service: ${{ matrix.service }}
+          token: ${{ secrets.OKTETO_TOKEN }}

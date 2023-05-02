@@ -1,0 +1,11 @@
+# vscode related
+.vscode
+!.vscode/launch.json
+
+# 
+.idea
+
+.env
+
+/internal/database/ent/*
+!/internal/database/ent/schema

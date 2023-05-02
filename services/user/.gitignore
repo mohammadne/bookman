@@ -1,0 +1,8 @@
+# vscode related
+.vscode
+!.vscode/launch.json
+
+# 
+.idea
+
+.env

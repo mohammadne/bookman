@@ -1,0 +1,16 @@
+syntax = "proto3";
+option go_package = "./gen/auth";
+package auth;
+
+message TokenContract {
+    string Token = 1;
+}
+
+message TokenMetadataResponse {
+    bool IsValid = 1;
+    uint64 Id = 2;
+}
+
+service Auth {
+    rpc TokenMetadata(TokenContract) returns (TokenMetadataResponse) {}
+}

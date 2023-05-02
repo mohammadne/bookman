@@ -1,0 +1,6 @@
+icon: assets/logo.png
+deploy:
+  - kubectl apply -f deployment/user/config-map.yml
+  - kubectl apply -f deployment/user/service.yml
+  - kubectl apply -f deployment/user/stateful-set.yml
+#   - kubectl apply -f deployment/user/deployment.yml

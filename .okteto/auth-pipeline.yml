@@ -1,0 +1,5 @@
+icon: assets/logo.png
+deploy:
+  - kubectl apply -f deployment/auth/service.yml
+  - kubectl apply -f deployment/auth/persistent-volume.yml
+  - kubectl apply -f deployment/auth/deployment.yml

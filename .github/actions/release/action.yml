@@ -1,0 +1,33 @@
+name: "Release images on Okteto"
+
+description: "Release images on Okteto"
+
+inputs:
+  token:
+    description: "personal okteto token"
+    required: true
+  service:
+    description: "name of the service"
+    required: true
+  namespace:
+    description: "name of the namespace"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: okteto/login@latest
+      with:
+        token: ${{ inputs.token }}
+
+    - name: "Activate Namespace"
+      uses: okteto/namespace@latest
+      with:
+        namespace: ${{ inputs.namespace }}
+
+    - name: "Trigger the pipeline"
+      uses: okteto/pipeline@master
+      with:
+        name: ${{ inputs.service }}
+        filename: .okteto/${{ inputs.service }}-pipeline.yml
+        namespace: ${{ inputs.namespace }}

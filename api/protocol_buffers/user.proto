@@ -1,0 +1,17 @@
+syntax = "proto3";
+option go_package = "./gen/user";
+package user;
+
+message UserCredentialContract {
+    string Email = 1;
+    string Password = 2;
+}
+
+message UserResponse {
+    uint64 Id = 1;
+}
+
+service User {
+    rpc CreateUser(UserCredentialContract) returns (UserResponse) {}
+    rpc GetUser(UserCredentialContract) returns (UserResponse) {}
+}
